@@ -1,4 +1,4 @@
-# Regicaide
+# Regicide - Kings and Robots
 A reinforcement learning project where we teach a model to play Regicide.
 
 ## Game Rules
