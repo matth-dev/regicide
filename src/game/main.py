@@ -29,10 +29,19 @@ def init_tavern_deck() -> list[Card]:
     return deck
 
 def init_enemies() -> list[Enemy]:
-    pass
+    enemy_deck:list[Enemy] = []
+    for enemy in enemies_infos:
+        enemies_color:list[Enemy] = []
+        for suit in suits:
+            enemies_color.append(Enemy(value=enemy["attack"], suit=Suit(color=suit), health=enemy["health"], name=enemy["name"]))
+        random.shuffle(enemies_color)
+        enemy_deck.extend(enemies_color)
+    return enemy_deck
 
 tavern_deck = init_tavern_deck()
 
 random.shuffle(tavern_deck)
 
-print(tavern_deck)
+enemies_deck = init_enemies()
+
+print(enemies_deck[0])
