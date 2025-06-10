@@ -21,7 +21,7 @@ enemies_infos = [
     }
 ]
 
-def init_deck() -> list[Card]:
+def init_tavern_deck() -> list[Card]:
     deck:list[Card] = []
     for suit in suits:
         for i in range(1, 11):
@@ -31,8 +31,8 @@ def init_deck() -> list[Card]:
 def init_enemies() -> list[Enemy]:
     pass
 
-tavern_deck = init_deck()
+tavern_deck = init_tavern_deck()
 
-random.shuffle(starting_deck)
+random.shuffle(tavern_deck)
 
-print(starting_deck)
+print(tavern_deck)
