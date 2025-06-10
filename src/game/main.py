@@ -26,6 +26,7 @@ def init_tavern_deck() -> list[Card]:
     for suit in suits:
         for i in range(1, 11):
             deck.append(Card(value=i, suit=Suit(color=suit)))
+    random.shuffle(deck)
     return deck
 
 def init_enemies() -> list[Enemy]:
@@ -40,8 +41,20 @@ def init_enemies() -> list[Enemy]:
 
 tavern_deck = init_tavern_deck()
 
-random.shuffle(tavern_deck)
-
 enemies_deck = init_enemies()
 
+alice = Player(name="Alice")
+bob = Player(name="Bob")
+
+max_hands_size = 7
+player_number = 2
+players:list[Player] = [alice, bob]
+
+for player in players:
+    for _ in range(0, max_hands_size):
+        player.hand.append(tavern_deck.pop())
+
+print(len(alice.hand))
+print(len(bob.hand))
+print(len(tavern_deck))
 print(enemies_deck[0])
