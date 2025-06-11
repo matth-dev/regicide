@@ -1,8 +1,9 @@
 from classes import *
+from utils import *
+
 import random
 
 suits = ["♠", "♥", "♦", "♣"]
-
 enemies_infos = [
     {
         "name": "Jack",
@@ -39,22 +40,25 @@ def init_enemies() -> list[Enemy]:
         enemy_deck.extend(enemies_color)
     return enemy_deck
 
-tavern_deck = init_tavern_deck()
+def init_players_hand(players:list[Player]):
+    max_hand_size = 9 - len(players)
+    for player in players:
+        for _ in range(0, max_hand_size):
+            player.hand.append(tavern_deck.pop())
 
-enemies_deck = init_enemies()
+def main():
+    tavern_deck = init_tavern_deck()
+    enemies_deck = init_enemies()
 
-alice = Player(name="Alice")
-bob = Player(name="Bob")
+    alice = Player(name="Alice")
+    bob = Player(name="Bob")
 
-max_hands_size = 7
-player_number = 2
-players:list[Player] = [alice, bob]
+    max_hands_size = 7
+    player_number = 2
+    players: list[Player] = [alice, bob]
 
-for player in players:
-    for _ in range(0, max_hands_size):
-        player.hand.append(tavern_deck.pop())
+    init_players_hand(players)
+    game_utils.show_player_hand(alice)
 
-print(len(alice.hand))
-print(len(bob.hand))
-print(len(tavern_deck))
-print(enemies_deck[0])
+if __name__ == "__main__":
+    main()
