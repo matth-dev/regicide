@@ -1,3 +1,3 @@
-from .classes import Card, Suit, Enemy, Player
+from .classes import Card, Suit, Enemy, Player, TavernDeck
 
-__all__ = ["Card", "Suit", "Enemy", "Player"]
+__all__ = ["Card", "Suit", "Enemy", "Player", "TavernDeck"]

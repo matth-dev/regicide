@@ -1,3 +1,6 @@
+import random
+from ..utils import constants
+
 class Suit:
     def __init__(self, color:str):
         self.color = color
@@ -24,3 +27,18 @@ class Player:
     def __init__(self, name:str):
         self.name = name
         self.hand:list[Card] = []
+
+    def show_hand(self):
+        return [str(card) for card in self.hand]
+
+class TavernDeck:
+    def __init__(self, jesters=False):
+        deck = []
+        for suit in constants.suits:
+            for i in range(1, 11):
+                deck.append(Card(value=i, suit=Suit(color=suit)))
+        if jesters:
+            pass
+            # add jesters to deck
+        random.shuffle(deck)
+        self.deck:list[Card] = deck
