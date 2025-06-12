@@ -4,16 +4,21 @@ import random
 
 def init_enemies() -> list[Enemy]:
         enemy_deck:list[Enemy] = []
+
         for enemy in constants.enemies_infos:
             enemies_color:list[Enemy] = []
+
             for suit in constants.suits:
-                enemies_color.append(Enemy(value=enemy["attack"], suit=Suit(color=suit), health=enemy["health"], name=enemy["name"]))
+                enemies_color.append(Enemy(value=enemy["attack"], suit=Suit(name=suit[0], color=suit[1]), health=enemy["health"], name=enemy["name"]))
+
             random.shuffle(enemies_color)
             enemy_deck.extend(enemies_color)
+
         return enemy_deck
 
 def init_players_hand(tavern_deck:TavernDeck, players:list[Player]):
     max_hand_size = 9 - len(players)
+    
     for _ in range(0, max_hand_size):
         for player in players:
             player.hand.append(tavern_deck.deck.pop())
@@ -42,7 +47,7 @@ def main():
             card = alice.hand.pop(choice - 1)
             print(f"You choose card {card}")
 
-            current_enemy.health -= card.value
+            current_enemy.take_damage(card)
 
             if current_enemy.health <= 0:
                 enemies_deck.pop(0)

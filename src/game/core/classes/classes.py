@@ -2,7 +2,8 @@ import random
 from ...utils import constants
 
 class Suit:
-    def __init__(self, color:str):
+    def __init__(self, name:str, color:str):
+        self.name = name
         self.color = color
 
 class Card:
@@ -19,10 +20,23 @@ class Enemy(Card):
         self.health=health
         self.name=name
         self.attack = value
-        self.immune=True
+        self.immune = True
 
     def __str__(self):
         return f"Name: {self.name}{self.suit.color} // Attack: {str(self.attack)} // Health remaining: {self.health} // Immune: {self.immune}"
+    
+    def take_damage(self, card:Card):
+        value = card.value
+        if card.suit.name == "Spade":
+            if self.suit.name != "Spade" or not self.immune:
+                value *= 2
+
+        if card.suit.name == "Club":
+            if self.suit.name != "Club" or not self.immune:
+                self.attack = max(0, self.attack - card.value)
+
+        self.health -= value
+        print(f"{self.name} took {value} damage.")
     
 class Player:
     def __init__(self, name:str):
@@ -37,7 +51,7 @@ class TavernDeck:
         deck = []
         for suit in constants.suits:
             for i in range(1, 11):
-                deck.append(Card(value=i, suit=Suit(color=suit)))
+                deck.append(Card(value=i, suit=Suit(suit[0], suit[1])))
         if jesters:
             pass
             # add jesters to deck

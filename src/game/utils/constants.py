@@ -1,4 +1,4 @@
-suits = ["♠", "♥", "♦", "♣"]
+suits = [("Spade", "♠"), ("Heart", "♥"), ("Diamond", "♦"), ("Club", "♣")]
 
 enemies_infos = [
     {
