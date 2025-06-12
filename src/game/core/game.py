@@ -23,6 +23,9 @@ def init_players_hand(tavern_deck:TavernDeck, players:list[Player]):
         for player in players:
             player.hand.append(tavern_deck.deck.pop())
 
+def check_playability(enemies_deck:list[Enemy], player:Player, card:Card) -> bool:
+    return True
+
 def main():
     tavern_deck = TavernDeck(jesters=False)
     enemies_deck = init_enemies()
@@ -39,23 +42,27 @@ def main():
     while game:
         current_enemy = enemies_deck[0]
 
-        if alice.hand:
-            print(alice.show_hand())
-            print(current_enemy)
+        if enemies_deck:
+            if alice.hand:
+                print(alice.show_hand())
+                print(current_enemy)
 
-            choice = int(input(f"Choose a card from 1 to {len(alice.hand)}\n"))
-            card = alice.hand.pop(choice - 1)
-            print(alice.get_hand_value())
-            print(f"You choose card {card}")
+                choice = int(input(f"Choose a card from 1 to {len(alice.hand)}. To yield, press 0\n"))
+                if choice == 0:
+                    print(f"You yielded.")
+                else:
+                    card = alice.hand.pop(choice - 1)
 
-            current_enemy.take_damage(card)
-            
-            if current_enemy.health <= 0:
-                enemies_deck.pop(0)
+                    print(f"You played card {card}")
+
+                if current_enemy.health <= 0:
+                    enemies_deck.pop(0)
+            else:
+                print("No more cards")
+                game = False
         else:
-            print("No more cards")
+            print("You won")
             game = False
-
     print("Game Over")
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import random
 from ...utils import constants
+from enum import Enum
 
 class Suit:
     def __init__(self, name:str, color:str):
@@ -25,19 +26,6 @@ class Enemy(Card):
     def __str__(self):
         return f"Name: {self.name}{self.suit.color} // Attack: {str(self.attack)} // Health remaining: {self.health} // Immune: {self.immune}"
     
-    def take_damage(self, card:Card) -> None:
-        value = card.value
-        if card.suit.name == "Spade":
-            if self.suit.name != "Spade" or not self.immune:
-                value *= 2
-
-        if card.suit.name == "Club":
-            if self.suit.name != "Club" or not self.immune:
-                self.attack = max(0, self.attack - card.value)
-
-        self.health -= value
-        print(f"{self.name} took {value} damage.")
-    
 class Player:
     def __init__(self, name:str):
         self.name = name
@@ -61,3 +49,14 @@ class TavernDeck:
         random.shuffle(deck)
         
         self.deck:list[Card] = deck
+
+class GamePhase(Enum):
+    SETUP = "setup"
+    PLAYER_TURN = "player_turn"
+    CARD_POWER = "card_power"
+    ENEMY_TURN = "enemy_turn"
+    GAME_OVER = "game_over"
+
+class GameState:
+    def __init__(self):
+        pass
