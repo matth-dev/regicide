@@ -14,8 +14,8 @@ def init_enemies() -> list[Enemy]:
 
 def init_players_hand(tavern_deck:TavernDeck, players:list[Player]):
     max_hand_size = 9 - len(players)
-    for player in players:
-        for _ in range(0, max_hand_size):
+    for _ in range(0, max_hand_size):
+        for player in players:
             player.hand.append(tavern_deck.deck.pop())
 
 def main():
@@ -25,12 +25,32 @@ def main():
     alice = Player(name="Alice")
     bob = Player(name="Bob")
 
-    players: list[Player] = [alice, bob]
+    players: list[Player] = [alice]
 
     init_players_hand(tavern_deck, players)
 
-    print(alice.show_hand())
+    game = True
 
+    while game:
+        current_enemy = enemies_deck[0]
+
+        if alice.hand:
+            print(alice.show_hand())
+            print(current_enemy)
+
+            choice = int(input(f"Choose a card from 1 to {len(alice.hand)}\n"))
+            card = alice.hand.pop(choice - 1)
+            print(f"You choose card {card}")
+
+            current_enemy.health -= card.value
+
+            if current_enemy.health <= 0:
+                enemies_deck.pop(0)
+        else:
+            print("No more cards")
+            game = False
+
+    print("Game Over")
 
 if __name__ == "__main__":
     main()

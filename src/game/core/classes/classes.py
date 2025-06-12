@@ -18,10 +18,11 @@ class Enemy(Card):
         super().__init__(value, suit)
         self.health=health
         self.name=name
+        self.attack = value
         self.immune=True
 
     def __str__(self):
-        return f"Name: {self.name} // {str(self.value)}+{self.suit.color} // Health remaining: {self.health}. Immune: {self.immune}"
+        return f"Name: {self.name}{self.suit.color} // Attack: {str(self.attack)} // Health remaining: {self.health} // Immune: {self.immune}"
     
 class Player:
     def __init__(self, name:str):
