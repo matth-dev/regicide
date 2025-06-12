@@ -25,7 +25,7 @@ class Enemy(Card):
     def __str__(self):
         return f"Name: {self.name}{self.suit.color} // Attack: {str(self.attack)} // Health remaining: {self.health} // Immune: {self.immune}"
     
-    def take_damage(self, card:Card):
+    def take_damage(self, card:Card) -> None:
         value = card.value
         if card.suit.name == "Spade":
             if self.suit.name != "Spade" or not self.immune:
@@ -43,8 +43,11 @@ class Player:
         self.name = name
         self.hand:list[Card] = []
 
-    def show_hand(self):
+    def show_hand(self) -> list[str]:
         return [str(card) for card in self.hand]
+    
+    def get_hand_value(self) -> int:
+        return sum([card.value for card in self.hand])
 
 class TavernDeck:
     def __init__(self, jesters=False):
