@@ -1,5 +1,5 @@
-from classes import *
-from utils import constants
+from .classes import *
+from ..utils import constants
 import random
 
 def init_enemies() -> list[Enemy]:
@@ -29,7 +29,7 @@ def main():
 
     init_players_hand(tavern_deck, players)
 
-    alice.show_hand()
+    print(alice.show_hand())
 
 
 if __name__ == "__main__":

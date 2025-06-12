@@ -1,5 +1,5 @@
 import random
-from ..utils import constants
+from ...utils import constants
 
 class Suit:
     def __init__(self, color:str):
