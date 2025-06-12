@@ -22,7 +22,7 @@ class Enemy(Card):
 
     def __str__(self):
         return f"Name: {self.name} // {str(self.value)}+{self.suit.color} // Health remaining: {self.health}. Immune: {self.immune}"
-
+    
 class Player:
     def __init__(self, name:str):
         self.name = name
@@ -41,4 +41,5 @@ class TavernDeck:
             pass
             # add jesters to deck
         random.shuffle(deck)
+        
         self.deck:list[Card] = deck
