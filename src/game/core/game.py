@@ -1,6 +1,7 @@
 from .classes import *
 from ..utils import constants
 import random
+from typing import Optional
 
 def init_enemies() -> list[Enemy]:
         enemy_deck:list[Enemy] = []
@@ -42,7 +43,7 @@ def check_game_over(enemy:Enemy, player:Player) -> bool:
         return True
     return False
 
-def check_playability(enemies_deck:list[Enemy], player:Player, card:Card) -> bool:
+def check_playability(enemies_deck:list[Enemy], player:Player, card:Optional[Card]) -> bool:
     (damage_value, enemy_attack_value) = calculate_values(enemies_deck[0], card)
 
     # We need to check if the player would survive the next enemy attack (either the current one or the next one, if the current one will die to the attack and there is at least one more enemy)
@@ -87,7 +88,7 @@ def main():
 
                     print(f"You played card {card}")
 
-                if check_playability(enemies_deck=enemies_deck, player=alice, card=card):
+                if check_playability(enemies_deck=enemies_deck, player=alice, card=card if card else None):
                     damage_value, attack_value = calculate_values(current_enemy, card=card)
                     current_enemy.health -= damage_value
                     current_enemy.attack = max(0, attack_value)
@@ -98,6 +99,8 @@ def main():
                 if current_enemy.health <= 0:
                     enemies_deck.pop(0)
 
+                print(f"Damage to tank: {current_enemy.attack}")
+                alice.show_hand()
                 alice.take_damage(current_enemy.attack)
             else:
                 print("No more cards")

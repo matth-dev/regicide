@@ -37,11 +37,22 @@ class Player:
     def get_hand_value(self) -> int:
         return sum([card.value for card in self.hand])
     
+    def choose_cards(self) -> list[Card]:
+        while True:
+            card_indexes = [int(index) - 1 for index in input("Choose cards \n")]
+            try:
+                return [self.hand.pop(index) for index in card_indexes]
+            except IndexError:
+                print(f"Please try choosing existing cards")
+
+    
     def get_cards_value(self, cards:list[Card]) -> int:
         return sum([card.value for card in cards])
     
-    def take_damage(self, enemy_attack_value):
-        pass
+    def take_damage(self, enemy_attack_value:int):
+        
+        while self.get_cards_value(self.choose_cards()) < enemy_attack_value:
+            continue
 
 class TavernDeck:
     def __init__(self, jesters=False):
