@@ -28,19 +28,35 @@ def calculate_values(enemy:Enemy, card:Card) -> tuple[int, int]:
     enemy_attack_value = enemy.attack
 
     if card.suit.name == "Club":
-        if enemy.suit.name != "Club" and not enemy.immune:
+        if enemy.suit.name != "Club" or not enemy.immune:
             damage_value *= 2
 
     if card.suit.name == "Spade":
-        if enemy.suit.name != "Spade" and not enemy.immune:
+        if enemy.suit.name != "Spade" or not enemy.immune:
             enemy_attack_value -= damage_value
 
     return (damage_value, enemy_attack_value)
 
+def check_game_over(enemy:Enemy, player:Player) -> bool:
+    if player.get_hand_value() < enemy.attack:
+        return True
+    return False
+
 def check_playability(enemies_deck:list[Enemy], player:Player, card:Card) -> bool:
     (damage_value, enemy_attack_value) = calculate_values(enemies_deck[0], card)
 
+    # We need to check if the player would survive the next enemy attack (either the current one or the next one, if the current one will die to the attack and there is at least one more enemy)
+    # If the current enemy would die to the next player attack, we take the next enemy attack value
+    # Otherwise, we calculate the damage the player will take after taking into consideration any card effect (lower attack) since the lower attack doesn't apply to the current enemy if it died
+    if enemies_deck[0].health - damage_value <= 0:
+        if len(enemies_deck) == 1:
+            return True
+        else:
+            enemy_attack_value = enemies_deck[1].attack
     
+    if player.get_hand_value() < enemy_attack_value:
+        return False
+
     return True
 
 def main():
@@ -57,9 +73,8 @@ def main():
     game = True
 
     while game:
-        current_enemy = enemies_deck[0]
-
         if enemies_deck:
+            current_enemy = enemies_deck[0]
             if alice.hand:
                 print(alice.show_hand())
                 print(current_enemy)
@@ -72,8 +87,18 @@ def main():
 
                     print(f"You played card {card}")
 
+                    if check_playability(enemies_deck=enemies_deck, player=alice, card=card):
+                        damage_value, attack_value = calculate_values(current_enemy, card=card)
+                        current_enemy.health -= damage_value
+                        current_enemy.attack = max(0, attack_value)
+                    else:
+                        print(f"Can't play this card: You would die.")
+                        alice.hand.append(card)
+
                 if current_enemy.health <= 0:
                     enemies_deck.pop(0)
+
+                alice.take_damage(current_enemy.attack)
             else:
                 print("No more cards")
                 game = False

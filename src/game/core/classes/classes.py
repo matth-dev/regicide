@@ -36,6 +36,9 @@ class Player:
     
     def get_hand_value(self) -> int:
         return sum([card.value for card in self.hand])
+    
+    def take_damage(self, enemy_attack_value):
+        pass
 
 class TavernDeck:
     def __init__(self, jesters=False):
