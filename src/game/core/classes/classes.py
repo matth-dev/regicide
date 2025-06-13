@@ -41,7 +41,7 @@ class Player:
         return sum([card.value for card in cards])
     
     def take_damage(self, enemy_attack_value):
-        cards
+        pass
 
 class TavernDeck:
     def __init__(self, jesters=False):
