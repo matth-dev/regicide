@@ -39,9 +39,10 @@ class Player:
     
     def choose_cards(self) -> list[Card]:
         while True:
-            card_indexes = [int(index) - 1 for index in input("Choose cards \n")]
+            print(self.show_hand())
+            card_indexes = [(int(index) - 1) for index in input("Choose cards \n")] # Transform "45" in [3, 4]
             try:
-                return [self.hand.pop(index) for index in card_indexes]
+                return [self.hand.pop(index) for index in sorted(card_indexes, reverse=True)]
             except IndexError:
                 print(f"Please try choosing existing cards")
 

@@ -81,6 +81,7 @@ def main():
                 print(current_enemy)
 
                 choice = int(input(f"Choose a card from 1 to {len(alice.hand)}. To yield, press 0\n"))
+                # TODO: handle yielding
                 if choice == 0:
                     print(f"You yielded.")
                 else:
@@ -99,8 +100,7 @@ def main():
                 if current_enemy.health <= 0:
                     enemies_deck.pop(0)
 
-                print(f"Damage to tank: {current_enemy.attack}")
-                alice.show_hand()
+                print(f"{current_enemy.name} is dealing {current_enemy.attack} damage. Shield yourself:")
                 alice.take_damage(current_enemy.attack)
             else:
                 print("No more cards")
