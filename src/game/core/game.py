@@ -23,7 +23,24 @@ def init_players_hand(tavern_deck:TavernDeck, players:list[Player]):
         for player in players:
             player.hand.append(tavern_deck.deck.pop())
 
+def calculate_values(enemy:Enemy, card:Card) -> tuple[int, int]:
+    damage_value = card.value
+    enemy_attack_value = enemy.attack
+
+    if card.suit.name == "Club":
+        if enemy.suit.name != "Club" and not enemy.immune:
+            damage_value *= 2
+
+    if card.suit.name == "Spade":
+        if enemy.suit.name != "Spade" and not enemy.immune:
+            enemy_attack_value -= damage_value
+
+    return (damage_value, enemy_attack_value)
+
 def check_playability(enemies_deck:list[Enemy], player:Player, card:Card) -> bool:
+    (damage_value, enemy_attack_value) = calculate_values(enemies_deck[0], card)
+
+    
     return True
 
 def main():
