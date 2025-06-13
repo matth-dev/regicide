@@ -37,11 +37,12 @@ class Player:
     def get_hand_value(self) -> int:
         return sum([card.value for card in self.hand])
     
-    def choose_cards(self) -> list[Card]:
+    def play_cards(self) -> list[Card]:
         while True:
             print(self.show_hand())
-            card_indexes = [(int(index) - 1) for index in input("Choose cards \n")] # Transform "45" in [3, 4]
+            card_indexes = [(int(index) - 1) for index in input(f"Choose cards to play between 1 and {len(self.hand)}\n")] # Transform "45" in [3, 4]
             try:
+                if not all(index >=0 for index in card_indexes): raise IndexError
                 return [self.hand.pop(index) for index in sorted(card_indexes, reverse=True)]
             except IndexError:
                 print(f"Please try choosing existing cards")
@@ -52,7 +53,7 @@ class Player:
     
     def take_damage(self, enemy_attack_value:int):
         
-        while self.get_cards_value(self.choose_cards()) < enemy_attack_value:
+        while self.get_cards_value(self.play_cards()) < enemy_attack_value:
             continue
 
 class TavernDeck:
@@ -76,5 +77,9 @@ class GamePhase(Enum):
     GAME_OVER = "game_over"
 
 class GameState:
+    def __init__(self):
+        pass
+
+class Game:
     def __init__(self):
         pass

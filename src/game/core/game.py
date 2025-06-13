@@ -24,17 +24,18 @@ def init_players_hand(tavern_deck:TavernDeck, players:list[Player]):
         for player in players:
             player.hand.append(tavern_deck.deck.pop())
 
-def calculate_values(enemy:Enemy, card:Card) -> tuple[int, int]:
-    damage_value = card.value
+def calculate_values(enemy:Enemy, card:Optional[Card]) -> tuple[int, int]:
+    damage_value = card.value if card else 0
     enemy_attack_value = enemy.attack
 
-    if card.suit.name == "Club":
-        if enemy.suit.name != "Club" or not enemy.immune:
-            damage_value *= 2
+    if card:
+        if card.suit.name == "Club":
+            if enemy.suit.name != "Club" or not enemy.immune:
+                damage_value *= 2
 
-    if card.suit.name == "Spade":
-        if enemy.suit.name != "Spade" or not enemy.immune:
-            enemy_attack_value -= damage_value
+        if card.suit.name == "Spade":
+            if enemy.suit.name != "Spade" or not enemy.immune:
+                enemy_attack_value -= damage_value
 
     return (damage_value, enemy_attack_value)
 
@@ -81,15 +82,16 @@ def main():
                 print(current_enemy)
 
                 choice = int(input(f"Choose a card from 1 to {len(alice.hand)}. To yield, press 0\n"))
-                # TODO: handle yielding
+
                 if choice == 0:
                     print(f"You yielded.")
+                    card = None
                 else:
                     card = alice.hand.pop(choice - 1)
 
                     print(f"You played card {card}")
 
-                if check_playability(enemies_deck=enemies_deck, player=alice, card=card if card else None):
+                if check_playability(enemies_deck=enemies_deck, player=alice, card=card):
                     damage_value, attack_value = calculate_values(current_enemy, card=card)
                     current_enemy.health -= damage_value
                     current_enemy.attack = max(0, attack_value)
@@ -100,8 +102,9 @@ def main():
                 if current_enemy.health <= 0:
                     enemies_deck.pop(0)
 
-                print(f"{current_enemy.name} is dealing {current_enemy.attack} damage. Shield yourself:")
-                alice.take_damage(current_enemy.attack)
+                if current_enemy.attack >=0:
+                    print(f"{current_enemy.name} is dealing {current_enemy.attack} damage. Shield yourself:")
+                    alice.take_damage(current_enemy.attack)
             else:
                 print("No more cards")
                 game = False
