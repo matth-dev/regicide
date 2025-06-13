@@ -87,13 +87,13 @@ def main():
 
                     print(f"You played card {card}")
 
-                    if check_playability(enemies_deck=enemies_deck, player=alice, card=card):
-                        damage_value, attack_value = calculate_values(current_enemy, card=card)
-                        current_enemy.health -= damage_value
-                        current_enemy.attack = max(0, attack_value)
-                    else:
-                        print(f"Can't play this card: You would die.")
-                        alice.hand.append(card)
+                if check_playability(enemies_deck=enemies_deck, player=alice, card=card):
+                    damage_value, attack_value = calculate_values(current_enemy, card=card)
+                    current_enemy.health -= damage_value
+                    current_enemy.attack = max(0, attack_value)
+                else:
+                    print(f"Can't do this move: You would die.")
+                    alice.hand.append(card)
 
                 if current_enemy.health <= 0:
                     enemies_deck.pop(0)
