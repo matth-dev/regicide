@@ -51,10 +51,18 @@ class Player:
     def get_cards_value(self, cards:list[Card]) -> int:
         return sum([card.value for card in cards])
     
-    def take_damage(self, enemy_attack_value:int):
-        
-        while self.get_cards_value(self.play_cards()) < enemy_attack_value:
-            continue
+    def take_damage(self, enemy:Enemy):
+        cards = []
+        value = 0
+        while value < enemy.attack:
+            if cards:
+                print(f"{self.get_cards_value(cards)} is not enough value,  please choose again")
+                self.hand.extend(cards)
+
+            print(f"{enemy.name} is dealing {enemy.attack} damage. Shield yourself:")
+            cards = self.play_cards()
+            value = self.get_cards_value(cards)
+        print(f"{self.name} successfully shield themself.")
 
 class TavernDeck:
     def __init__(self, jesters=False):
