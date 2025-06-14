@@ -55,7 +55,8 @@ def check_playability(enemies_deck:list[Enemy], player:Player, card:Optional[Car
             return True
         else:
             enemy_attack_value = enemies_deck[1].attack
-    
+
+    # We can also do player.get_cards_value(player.hand)
     if player.get_hand_value() < enemy_attack_value:
         return False
 
