@@ -24,47 +24,49 @@ class Enemy(Card):
         self.immune = True
 
     def __str__(self):
-        return f"Name: {self.name}{self.suit.color} // Attack: {str(self.attack)} // Health remaining: {self.health} // Immune: {self.immune}"
+        return f"{self.name}{self.suit.color} // Attack: {str(self.attack)} // Health remaining: {self.health} // Immune: {self.immune}"
     
 class Player:
     def __init__(self, name:str):
         self.name = name
         self.hand:list[Card] = []
 
-    def show_hand(self) -> list[str]:
+    def _show_hand(self) -> list[str]:
         return [str(card) for card in self.hand]
     
     def get_hand_value(self) -> int:
         return sum([card.value for card in self.hand])
     
-    def play_cards(self) -> list[Card]:
+    def choose_cards(self) -> list[Card]:
         while True:
-            print(self.show_hand())
-            card_indexes = [(int(index) - 1) for index in input(f"Choose cards to play between 1 and {len(self.hand)}\n")] # Transform "45" in [3, 4]
+            print(self._show_hand())
+            card_indexes = [(int(index) - 1) for index in input(f"Choose cards to play between 1 and {len(self.hand)}\n")]
             try:
                 if not all(index >=-1 for index in card_indexes): raise IndexError
                 if -1 in card_indexes:
                     return []
                 return [self.hand.pop(index) for index in sorted(card_indexes, reverse=True)]
             except IndexError:
-                print(f"Please try choosing existing cards or press 0 to yield while in attack phase.")
+                print(f"Choose between one or two existing cards or press 0 to yield while in attack phase.")
 
-    
     def get_cards_value(self, cards:list[Card]) -> int:
         return sum([card.value for card in cards])
     
-    def take_damage(self, enemy:Enemy):
-        cards = []
+    def take_damage(self, enemy:Enemy) -> None:
         value = 0
         while value < enemy.attack:
-            if cards:
-                print(f"{self.get_cards_value(cards)} is not enough value,  please choose again")
-                self.hand.extend(cards)
+            print(f"{enemy} is dealing {enemy.attack} damage. Shield yourself:")
 
-            print(f"{enemy.name} is dealing {enemy.attack} damage. Shield yourself:")
-            cards = self.play_cards()
-            value = self.get_cards_value(cards)
-        print(f"{self.name} successfully shield themself.")
+            if cards:= self.choose_cards():
+                value = self.get_cards_value(cards)
+
+                if value < enemy.attack: 
+                    print(f"{self.get_cards_value(cards)} is not enough value,  please choose again")
+                    self.hand.extend(cards)
+                else:
+                    print(f"{self.name} successfully shield themself.")
+            else:
+                print(f"You must choose at least one card and total cards value must be equal or superior to {enemy.attack}")
 
 class TavernDeck:
     def __init__(self, jesters=False):
@@ -87,9 +89,5 @@ class GamePhase(Enum):
     GAME_OVER = "game_over"
 
 class GameState:
-    def __init__(self):
-        pass
-
-class Game:
     def __init__(self):
         pass

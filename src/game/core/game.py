@@ -3,39 +3,50 @@ from ..utils import constants
 import random
 from typing import Optional
 
-def init_enemies() -> list[Enemy]:
-        enemy_deck:list[Enemy] = []
 
-        for enemy in constants.enemies_infos:
-            enemies_color:list[Enemy] = []
+class RegicideGame():
+    def __init__(self, players:list[Player], jesters:bool = False):
+        self.enemies = self._init_enemies()
+        self.tavern_deck = TavernDeck(jesters=jesters)
+        self.players = players
 
-            for suit in constants.suits:
-                enemies_color.append(Enemy(value=enemy["attack"], suit=Suit(name=suit[0], color=suit[1]), health=enemy["health"], name=enemy["name"]))
+        self._init_players_hand()
 
-            random.shuffle(enemies_color)
-            enemy_deck.extend(enemies_color)
+    def _init_enemies(self) -> list[Enemy]:
+            enemy_deck:list[Enemy] = []
 
-        return enemy_deck
+            for enemy in constants.enemies_infos:
+                enemies_color:list[Enemy] = []
 
-def init_players_hand(tavern_deck:TavernDeck, players:list[Player]):
-    max_hand_size = 9 - len(players)
+                for suit in constants.suits:
+                    enemies_color.append(Enemy(value=enemy["attack"], suit=Suit(name=suit[0], color=suit[1]), health=enemy["health"], name=enemy["name"]))
 
-    for _ in range(0, max_hand_size):
-        for player in players:
-            player.hand.append(tavern_deck.deck.pop())
+                random.shuffle(enemies_color)
+                enemy_deck.extend(enemies_color)
 
-def calculate_values(enemy:Enemy, card:Optional[Card]) -> tuple[int, int]:
-    damage_value = card.value if card else 0
+            return enemy_deck
+
+    def _init_players_hand(self):
+        max_hand_size = 9 - len(self.players)
+
+        for _ in range(0, max_hand_size):
+            for player in self.players:
+                player.hand.append(self.tavern_deck.deck.pop())
+
+def calculate_values(enemy:Enemy, cards:list[Card]) -> tuple[int, int]:
+    damage_value = 0
     enemy_attack_value = enemy.attack
+    if cards:
+        for card in cards:
+            damage_value += card.value
 
-    if card:
-        if card.suit.name == "Club":
-            if enemy.suit.name != "Club" or not enemy.immune:
-                damage_value *= 2
+            if card.suit.name == "Club":
+                if enemy.suit.name != "Club" or not enemy.immune:
+                    damage_value += card.value
 
-        if card.suit.name == "Spade":
-            if enemy.suit.name != "Spade" or not enemy.immune:
-                enemy_attack_value -= damage_value
+            if card.suit.name == "Spade":
+                if enemy.suit.name != "Spade" or not enemy.immune:
+                    enemy_attack_value -= damage_value
 
     return damage_value, enemy_attack_value
 
@@ -44,8 +55,8 @@ def check_game_over(enemy:Enemy, player:Player) -> bool:
         return True
     return False
 
-def check_playability(enemies_deck:list[Enemy], player:Player, card:Optional[Card]) -> bool:
-    (damage_value, enemy_attack_value) = calculate_values(enemies_deck[0], card)
+def check_playability(enemies_deck:list[Enemy], player:Player, cards:list[Card]) -> bool:
+    (damage_value, enemy_attack_value) = calculate_values(enemies_deck[0], cards)
 
     # This function assumes that player is not in a game over position yet.
     # We need to check if the player would survive the next enemy attack (either the current one or the next one, if the current one will die to the attack and there is at least one more enemy)
@@ -64,53 +75,45 @@ def check_playability(enemies_deck:list[Enemy], player:Player, card:Optional[Car
     return True
 
 def main():
-    tavern_deck = TavernDeck(jesters=False)
-    enemies_deck = init_enemies()
-
     alice = Player(name="Alice")
     bob = Player(name="Bob")
-
     players: list[Player] = [alice]
 
-    init_players_hand(tavern_deck, players)
+    game = RegicideGame(players=players, jesters=False)
 
-    game = True
+    game_on = True
 
-    while game:
-        if enemies_deck:
-            current_enemy = enemies_deck[0]
+    while game_on:
+        current_enemy = None
+        if game.enemies:
+            if not current_enemy: current_enemy = game.enemies[0]
             if alice.hand:
                 print(current_enemy)
-
-                choice = int(input(f"Choose a card from 1 to {len(alice.hand)}. To yield, press 0\n"))
-
-                if choice == 0:
-                    print(f"You yielded.")
-                    card = None
-                else:
-                    card = alice.hand.pop(choice - 1)
-
-                    print(f"You played card {card}")
-
-                if check_playability(enemies_deck=enemies_deck, player=alice, card=card):
-                    damage_value, attack_value = calculate_values(current_enemy, card=card)
+                print("To yield in the attack phase, press 0.")
+                cards = alice.choose_cards()
+                if not cards: print("You yielded.")
+                if check_playability(enemies_deck=game.enemies, player=alice, cards=cards):
+                    damage_value, attack_value = calculate_values(current_enemy, cards=cards)
                     current_enemy.health -= damage_value
                     current_enemy.attack = max(0, attack_value)
+                    print(current_enemy)
                 else:
                     print(f"Can't do this move: You would die.")
-                    alice.hand.append(card)
+                    if cards: alice.hand.extend(cards)
 
                 if current_enemy.health <= 0:
-                    enemies_deck.pop(0)
+                    print(f"{current_enemy.name} died.")
+                    game.enemies.pop(0)
+                    current_enemy = game.enemies[0]
 
                 if current_enemy.attack > 0:
                     alice.take_damage(current_enemy)
             else:
                 print("No more cards")
-                game = False
+                game_on = False
         else:
             print("You won")
-            game = False
+            game_on = False
     print("Game Over")
 
 if __name__ == "__main__":
