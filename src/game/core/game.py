@@ -37,7 +37,7 @@ def calculate_values(enemy:Enemy, card:Optional[Card]) -> tuple[int, int]:
             if enemy.suit.name != "Spade" or not enemy.immune:
                 enemy_attack_value -= damage_value
 
-    return (damage_value, enemy_attack_value)
+    return damage_value, enemy_attack_value
 
 def check_game_over(enemy:Enemy, player:Player) -> bool:
     if player.get_hand_value() < enemy.attack:
@@ -56,7 +56,8 @@ def check_playability(enemies_deck:list[Enemy], player:Player, card:Optional[Car
             return True
         else:
             enemy_attack_value = enemies_deck[1].attack
-    
+
+    # We can also do player.get_cards_value(player.hand)
     if player.get_hand_value() < enemy_attack_value:
         return False
 
@@ -102,9 +103,8 @@ def main():
                 if current_enemy.health <= 0:
                     enemies_deck.pop(0)
 
-                if current_enemy.attack >=0:
-                    print(f"{current_enemy.name} is dealing {current_enemy.attack} damage. Shield yourself:")
-                    alice.take_damage(current_enemy.attack)
+                if current_enemy.attack > 0:
+                    alice.take_damage(current_enemy)
             else:
                 print("No more cards")
                 game = False
