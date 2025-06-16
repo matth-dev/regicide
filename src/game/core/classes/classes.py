@@ -49,25 +49,6 @@ class Player:
             except IndexError:
                 print(f"Choose between one or two existing cards or press 0 to yield while in attack phase.")
 
-    def get_cards_value(self, cards:list[Card]) -> int:
-        return sum([card.value for card in cards])
-    
-    def take_damage(self, enemy:Enemy) -> None:
-        value = 0
-        while value < enemy.attack:
-            print(f"{enemy} is dealing {enemy.attack} damage. Shield yourself:")
-
-            if cards:= self.choose_cards():
-                value = self.get_cards_value(cards)
-
-                if value < enemy.attack: 
-                    print(f"{self.get_cards_value(cards)} is not enough value,  please choose again")
-                    self.hand.extend(cards)
-                else:
-                    print(f"{self.name} successfully shield themself.")
-            else:
-                print(f"You must choose at least one card and total cards value must be equal or superior to {enemy.attack}")
-
 class TavernDeck:
     def __init__(self, jesters=False):
         deck = []
