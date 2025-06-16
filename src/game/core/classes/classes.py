@@ -42,10 +42,12 @@ class Player:
             print(self.show_hand())
             card_indexes = [(int(index) - 1) for index in input(f"Choose cards to play between 1 and {len(self.hand)}\n")] # Transform "45" in [3, 4]
             try:
-                if not all(index >=0 for index in card_indexes): raise IndexError
+                if not all(index >=-1 for index in card_indexes): raise IndexError
+                if -1 in card_indexes:
+                    return []
                 return [self.hand.pop(index) for index in sorted(card_indexes, reverse=True)]
             except IndexError:
-                print(f"Please try choosing existing cards")
+                print(f"Please try choosing existing cards or press 0 to yield while in attack phase.")
 
     
     def get_cards_value(self, cards:list[Card]) -> int:

@@ -47,6 +47,7 @@ def check_game_over(enemy:Enemy, player:Player) -> bool:
 def check_playability(enemies_deck:list[Enemy], player:Player, card:Optional[Card]) -> bool:
     (damage_value, enemy_attack_value) = calculate_values(enemies_deck[0], card)
 
+    # This function assumes that player is not in a game over position yet.
     # We need to check if the player would survive the next enemy attack (either the current one or the next one, if the current one will die to the attack and there is at least one more enemy)
     # If the current enemy would die to the next player attack, we take the next enemy attack value
     # Otherwise, we calculate the damage the player will take after taking into consideration any card effect (lower attack) since the lower attack doesn't apply to the current enemy if it died
@@ -78,7 +79,6 @@ def main():
         if enemies_deck:
             current_enemy = enemies_deck[0]
             if alice.hand:
-                print(alice.show_hand())
                 print(current_enemy)
 
                 choice = int(input(f"Choose a card from 1 to {len(alice.hand)}. To yield, press 0\n"))
