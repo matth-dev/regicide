@@ -74,7 +74,7 @@ def main():
                 cards = alice.choose_cards()
                 if not cards: print("You yielded.")
                 if check_playability(cards=cards):
-                    damage_value, attack_value = calculate_values(current_enemy, cards=cards)
+                    damage_value, attack_value = game.calculate_values(current_enemy, cards=cards)
                     current_enemy.health -= damage_value
                     current_enemy.attack = max(0, attack_value)
                     game.discard_pile.extend(cards)
