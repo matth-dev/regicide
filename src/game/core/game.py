@@ -3,8 +3,7 @@ from ..utils import constants
 import random
 from typing import Optional
 
-
-class RegicideGame():
+class RegicideGame:
     def __init__(self, players:list[Player], jesters:bool = False):
         self.enemies = self._init_enemies()
         self.tavern_deck = TavernDeck(jesters=jesters)
@@ -53,33 +52,12 @@ class RegicideGame():
 
         return damage_value, enemy_attack_value
 
-    def check_game_over(enemy:Enemy, player:Player) -> bool:
-        if player.get_hand_value() < enemy.attack:
-            return True
-        return False
-
-    def check_playability(self, player:Player, cards:list[Card]) -> bool:
-        (damage_value, enemy_attack_value) = self.calculate_values(self.enemies[0], cards)
-
-        # This function assumes that player is not in a game over position yet.
-        # We need to check if the player would survive the next enemy attack
-        # If the current enemy would die to the next player attack, we take the next enemy attack value
-        # Otherwise, we calculate the damage the player will take after taking into consideration any card effect (lower attack) since the lower attack doesn't apply to the current enemy if it died
-        if self.enemies[0].health - damage_value <= 0:
-            if len(self.enemies) == 1:
-                return True
-            else:
-                enemy_attack_value = self.enemies[1].attack
-
-        # We can also do player.get_cards_value(player.hand)
-        if player.get_hand_value() < enemy_attack_value:
-            return False
-
-        return True
+def check_playability(cards:list[Card]) -> bool:
+    return True
 
 def main():
     alice = Player(name="Alice")
-    bob = Player(name="Bob")
+
     players: list[Player] = [alice]
 
     game = RegicideGame(players=players, jesters=False)
@@ -95,36 +73,27 @@ def main():
                 print("To yield in the attack phase, press 0.")
                 cards = alice.choose_cards()
                 if not cards: print("You yielded.")
-                if game.check_playability(enemies_deck=game.enemies, player=alice, cards=cards):
-                    damage_value, attack_value = game.calculate_values(current_enemy, cards=cards)
+                if check_playability(cards=cards):
+                    damage_value, attack_value = calculate_values(current_enemy, cards=cards)
                     current_enemy.health -= damage_value
                     current_enemy.attack = max(0, attack_value)
-                    print(current_enemy)
                     game.discard_pile.extend(cards)
                 else:
-                    print(f"Can't do this move: You would die.")
+                    print(f"Can't do this move")
                     if cards: alice.hand.extend(cards)
 
+                print(f"There are {len(game.discard_pile)} cards in the discard pile")
                 if current_enemy.health <= 0:
                     print(f"{current_enemy.name} died.")
                     game.enemies.pop(0)
                     current_enemy = game.enemies[0]
 
                 if current_enemy.attack > 0:
-                    value = 0
-                    while value < current_enemy.attack:
-                        print(f"{current_enemy} is dealing {current_enemy.attack} damage. Shield yourself:")
-
-                        if cards:= alice.choose_cards():
-                            value = game.get_cards_value(cards)
-
-                            if value < current_enemy.attack: 
-                                print(f"{game.get_cards_value(cards)} is not enough value,  please choose again")
-                                alice.hand.extend(cards)
-                            else:
-                                print(f"{alice.name} successfully shield themself.")
-                        else:
-                            print(f"You must choose at least one card and total cards value must be equal or superior to {current_enemy.attack}")
+                    if alice.get_hand_value() < current_enemy.attack:
+                        print("You can't shield. You lost")
+                        game_on = False
+                    else:
+                        alice.take_damage(current_enemy)
             else:
                 print("No more cards")
                 game_on = False
