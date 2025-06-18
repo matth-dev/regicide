@@ -53,6 +53,7 @@ class RegicideGame:
         return damage_value, enemy_attack_value
 
 def check_playability(cards:list[Card]) -> bool:
+    # Maybe here check if cards can be played together (same cards or animal companions)
     return True
 
 def main():

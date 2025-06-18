@@ -58,8 +58,8 @@ class Player:
                 self.hand.extend(cards)
             print(f"{enemy.name} is dealing {enemy.attack} damage. Shield yourself:")
             # TODO:
-            cards = self.play_cards()
-            value = self.get_cards_value(cards)
+            cards = self.choose_cards()
+            value = self.get(cards)
         print(f"{self.name} successfully shield themself.")
 
 class TavernDeck:
