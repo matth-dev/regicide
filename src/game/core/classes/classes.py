@@ -47,20 +47,10 @@ class Player:
                     return []
                 return [self.hand.pop(index) for index in sorted(card_indexes, reverse=True)]
             except IndexError:
-                print(f"Choose between one or two existing cards or press 0 to yield while in attack phase.")
+                print(f"Choose at least one existing card or press 0 to yield while in attack phase.")
 
     def take_damage(self, enemy:Enemy):
-        cards = []
-        value = 0
-        while value < enemy.attack:
-            if cards:
-                print(f"{self.get_hand_value(cards)} is not enough value,  please choose again")
-                self.hand.extend(cards)
-            print(f"{enemy.name} is dealing {enemy.attack} damage. Shield yourself:")
-            # TODO:
-            cards = self.choose_cards()
-            value = self.get(cards)
-        print(f"{self.name} successfully shield themself.")
+        pass
 
 class TavernDeck:
     def __init__(self, jesters=False):

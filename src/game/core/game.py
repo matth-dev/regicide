@@ -25,7 +25,7 @@ class RegicideGame:
 
             return enemy_deck
 
-    def _init_players_hand(self):
+    def _init_players_hand(self) -> None:
         max_hand_size = 9 - len(self.players)
 
         for _ in range(0, max_hand_size):
@@ -51,10 +51,20 @@ class RegicideGame:
                         enemy_attack_value -= damage_value
 
         return damage_value, enemy_attack_value
+    
+    def cards_to_shield(self, player:Player, enemy_attack:int) -> list[Card]:
+        while True:
+            print(f"Choose cards to shield yourself against {enemy_attack} damage.")
+            cards = player.choose_cards()
+            if self.get_cards_value(cards) >= enemy_attack:
+                return cards
+            else:
+                print("Not enough value to shield, please try again")
+                print(self.get_cards_value(cards))
 
-def check_playability(cards:list[Card]) -> bool:
-    # Maybe here check if cards can be played together (same cards or animal companions)
-    return True
+    def check_playability(self, cards:list[Card]) -> bool:
+        # Maybe here check if cards can be played together (same cards or animal companions)
+        return True
 
 def main():
     alice = Player(name="Alice")
@@ -74,7 +84,7 @@ def main():
                 print("To yield in the attack phase, press 0.")
                 cards = alice.choose_cards()
                 if not cards: print("You yielded.")
-                if check_playability(cards=cards):
+                if game.check_playability(cards=cards):
                     damage_value, attack_value = game.calculate_values(current_enemy, cards=cards)
                     current_enemy.health -= damage_value
                     current_enemy.attack = max(0, attack_value)
@@ -94,7 +104,8 @@ def main():
                         print("You can't shield. You lost")
                         game_on = False
                     else:
-                        alice.take_damage(current_enemy)
+                        cards = game.cards_to_shield(alice, current_enemy.attack)
+
             else:
                 print("No more cards")
                 game_on = False
