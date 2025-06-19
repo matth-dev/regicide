@@ -8,7 +8,6 @@ class RegicideGame:
         self.enemies = self._init_enemies()
         self.tavern_deck = TavernDeck(jesters=jesters)
         self.players = players
-        self.discard_pile:list[Card] = []
         self._init_players_hand()
 
     def _init_enemies(self) -> list[Enemy]:
@@ -35,9 +34,10 @@ class RegicideGame:
     def get_cards_value(self, cards:list[Card]) -> int:
         return sum([card.value for card in cards])
 
-    def calculate_values(self, enemy:Enemy, cards:list[Card]) -> tuple[int, int]:
+    def calculate_attack_value(self, enemy:Enemy, cards:list[Card]) -> tuple[int, int]:
+        #TODO: Properly handle animal companions
         damage_value = 0
-        enemy_attack_value = enemy.attack
+        lower_attack_value = 0
         if cards:
             for card in cards:
                 damage_value += card.value
@@ -48,23 +48,52 @@ class RegicideGame:
 
                 if card.suit.name == "Spade":
                     if enemy.suit.name != "Spade" or not enemy.immune:
-                        enemy_attack_value -= damage_value
+                        lower_attack_value += card.value
 
-        return damage_value, enemy_attack_value
+        return damage_value, lower_attack_value
     
-    def cards_to_shield(self, player:Player, enemy_attack:int) -> list[Card]:
+    def cards_to_shield(self, player:Player, enemy:Enemy) -> list[Card]:
         while True:
-            print(f"Choose cards to shield yourself against {enemy_attack} damage.")
+            print(enemy)
+            print(f"Choose cards to shield yourself against the current enemy damage.")
             cards = player.choose_cards()
-            if self.get_cards_value(cards) >= enemy_attack:
+            if self.get_cards_value(cards) >= enemy.attack:
+                self.tavern_deck.discard_pile.extend(cards)
                 return cards
             else:
                 print("Not enough value to shield, please try again")
-                print(self.get_cards_value(cards))
+                player.hand.extend(cards)
+
+    def cards_to_attack(self, player:Player) -> list[Card]:
+        while True:
+            cards = player.choose_cards()
+            if self.check_playability(cards) == True:
+                self.tavern_deck.discard_pile.extend(cards)
+                return cards
+            else:
+                print("This move is not allowed.")
+                player.hand.extend(cards)
+
 
     def check_playability(self, cards:list[Card]) -> bool:
-        # Maybe here check if cards can be played together (same cards or animal companions)
-        return True
+        values = [card.value for card in cards]
+        # If at most one card is played, no need to check anything.
+        if len(values) <= 1:
+            return True
+        else:
+        # If multiples cards are played
+            # If all cards have the same value
+            if len(set(values)) == 1:
+                # Check if total value inferior or equal to 10
+                if sum(values) <= 10:
+                    return True
+            else:
+            # If cards have a different value
+                # Check that only two cards are played and contains an animal companion (Aces)
+                if len(values) == 2 and 1 in values:
+                    return True
+        return False
+
 
 def main():
     alice = Player(name="Alice")
@@ -80,20 +109,14 @@ def main():
         if game.enemies:
             if not current_enemy: current_enemy = game.enemies[0]
             if alice.hand:
+                print(f"There are {len(game.tavern_deck.discard_pile)} cards in the discard pile")
                 print(current_enemy)
-                print("To yield in the attack phase, press 0.")
-                cards = alice.choose_cards()
-                if not cards: print("You yielded.")
-                if game.check_playability(cards=cards):
-                    damage_value, attack_value = game.calculate_values(current_enemy, cards=cards)
-                    current_enemy.health -= damage_value
-                    current_enemy.attack = max(0, attack_value)
-                    game.discard_pile.extend(cards)
-                else:
-                    print(f"Can't do this move")
-                    if cards: alice.hand.extend(cards)
+                cards = game.cards_to_attack(alice)
 
-                print(f"There are {len(game.discard_pile)} cards in the discard pile")
+                damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
+                current_enemy.health -= damage_value
+                current_enemy.attack -= lower_attack_value
+
                 if current_enemy.health <= 0:
                     print(f"{current_enemy.name} died.")
                     game.enemies.pop(0)
@@ -104,7 +127,7 @@ def main():
                         print("You can't shield. You lost")
                         game_on = False
                     else:
-                        cards = game.cards_to_shield(alice, current_enemy.attack)
+                        cards = game.cards_to_shield(alice, current_enemy)
 
             else:
                 print("No more cards")

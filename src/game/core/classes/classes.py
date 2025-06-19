@@ -49,11 +49,12 @@ class Player:
             except IndexError:
                 print(f"Choose at least one existing card or press 0 to yield while in attack phase.")
 
-    def take_damage(self, enemy:Enemy):
-        pass
-
 class TavernDeck:
     def __init__(self, jesters=False):
+        self.deck = self._init_deck(jesters)
+        self.discard_pile:list[Card] = []
+
+    def _init_deck(self, jesters) -> list[Card]:
         deck = []
         for suit in constants.suits:
             for i in range(1, 11):
@@ -62,8 +63,7 @@ class TavernDeck:
             pass
             # add jesters to deck
         random.shuffle(deck)
-        
-        self.deck:list[Card] = deck
+        return deck
 
 class GamePhase(Enum):
     SETUP = "setup"
