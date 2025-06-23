@@ -34,23 +34,16 @@ class RegicideGame:
     def get_cards_value(self, cards:list[Card]) -> int:
         return sum([card.value for card in cards])
 
-    def calculate_attack_value(self, enemy:Enemy, cards:list[Card]) -> tuple[int, int]:
-        #TODO: Properly handle animal companions
-        damage_value = 0
-        lower_attack_value = 0
-        if cards:
-            for card in cards:
-                damage_value += card.value
+    def calculate_attack_value(self, enemy:Enemy, cards:list[Card]) -> tuple[int, int, int, int]:
+        suits_played = [card.suit.name for card in cards]
+        value = self.get_cards_value(cards)
+        heal_value = value if "Heart" in suits_played and (enemy.immune == False or enemy.suit.name != "Heart") else 0
+        draw_value = value if "Diamond" in suits_played and (enemy.immune == False or enemy.suit.name != "Diamond") else 0
+        
+        lower_attack_value = value if "Spade" in suits_played and (enemy.immune == False or enemy.suit.name != "Spade") else 0
+        damage_value = value*2 if "Club" in suits_played and (enemy.immune == False or enemy.suit.name != "Club") else value
 
-                if card.suit.name == "Club":
-                    if enemy.suit.name != "Club" or not enemy.immune:
-                        damage_value += card.value
-
-                if card.suit.name == "Spade":
-                    if enemy.suit.name != "Spade" or not enemy.immune:
-                        lower_attack_value += card.value
-
-        return damage_value, lower_attack_value
+        return heal_value, draw_value, damage_value, lower_attack_value
     
     def cards_to_shield(self, player:Player, enemy:Enemy) -> list[Card]:
         while True:
@@ -73,6 +66,14 @@ class RegicideGame:
             else:
                 print("This move is not allowed.")
                 player.hand.extend(cards)
+
+    def heal(self, heal_value):
+        for _ in range(heal_value):
+            if self.tavern_deck.discard_pile:
+                self.tavern_deck.deck.append(self.tavern_deck.discard_pile.pop(random.randrange(0, len(self.tavern_deck.discard_pile))))
+            else:
+                print("No more cards in the discard pile")
+                break
 
 
     def check_playability(self, cards:list[Card]) -> bool:
@@ -112,8 +113,17 @@ def main():
                 print(f"There are {len(game.tavern_deck.discard_pile)} cards in the discard pile")
                 print(current_enemy)
                 cards = game.cards_to_attack(alice)
+                
+                heal_value, draw_value, damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
 
-                damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
+                print(f"Heal: {heal_value}")
+                print(len(game.tavern_deck.discard_pile))
+
+                if heal_value: game.heal(heal_value)
+                print(len(game.tavern_deck.discard_pile))
+                if draw_value: game.draw(draw_value)
+
+                print(f"damage: {damage_value}, lower_attack: {lower_attack_value}")
                 current_enemy.health -= damage_value
                 current_enemy.attack -= lower_attack_value
 
