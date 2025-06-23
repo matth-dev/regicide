@@ -1,16 +1,19 @@
 from .classes import *
 from ..utils import constants
 import random
+from itertools import cycle
 from typing import Optional
 
 class RegicideGame:
     def __init__(self, players:list[Player], jesters:bool = False):
-        self.enemies = self._init_enemies()
+        self.enemies = RegicideGame.init_enemies()
         self.tavern_deck = TavernDeck(jesters=jesters)
         self.players = players
-        self._init_players_hand()
+        self.max_hand_size = 9 - len(self.players)
+        self.draw_cards(draw_value=(self.max_hand_size * len(players)))
 
-    def _init_enemies(self) -> list[Enemy]:
+    @staticmethod
+    def init_enemies() -> list[Enemy]:
             enemy_deck:list[Enemy] = []
 
             for enemy in constants.enemies_infos:
@@ -25,9 +28,7 @@ class RegicideGame:
             return enemy_deck
 
     def _init_players_hand(self) -> None:
-        max_hand_size = 9 - len(self.players)
-
-        for _ in range(0, max_hand_size):
+        for _ in range(0, self.max_hand_size):
             for player in self.players:
                 player.hand.append(self.tavern_deck.deck.pop())
 
@@ -51,7 +52,6 @@ class RegicideGame:
             print(f"Choose cards to shield yourself against the current enemy damage.")
             cards = player.choose_cards()
             if self.get_cards_value(cards) >= enemy.attack:
-                self.tavern_deck.discard_pile.extend(cards)
                 return cards
             else:
                 print("Not enough value to shield, please try again")
@@ -60,8 +60,7 @@ class RegicideGame:
     def cards_to_attack(self, player:Player) -> list[Card]:
         while True:
             cards = player.choose_cards()
-            if self.check_playability(cards) == True:
-                self.tavern_deck.discard_pile.extend(cards)
+            if self.check_playability(cards):
                 return cards
             else:
                 print("This move is not allowed.")
@@ -74,6 +73,16 @@ class RegicideGame:
             else:
                 print("No more cards in the discard pile")
                 break
+
+    def draw_cards(self, draw_value):
+        for player in cycle(self.players):
+            if (draw_value and self.tavern_deck.deck):
+                if len(player.hand) < self.max_hand_size:
+                    player.hand.append(self.tavern_deck.deck.pop(0))
+                    draw_value -= 1
+            else:
+                break
+
 
 
     def check_playability(self, cards:list[Card]) -> bool:
@@ -116,16 +125,18 @@ def main():
                 
                 heal_value, draw_value, damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
 
-                print(f"Heal: {heal_value}")
-                print(len(game.tavern_deck.discard_pile))
+                if heal_value:
+                    game.heal(heal_value)
+                    print(f"Heal: {heal_value}")
 
-                if heal_value: game.heal(heal_value)
-                print(len(game.tavern_deck.discard_pile))
-                if draw_value: game.draw(draw_value)
+                if draw_value:
+                    game.draw_cards(draw_value)
+                    print(f"Draw: {draw_value}")
 
                 print(f"damage: {damage_value}, lower_attack: {lower_attack_value}")
                 current_enemy.health -= damage_value
                 current_enemy.attack -= lower_attack_value
+                print(len(cards))
 
                 if current_enemy.health <= 0:
                     print(f"{current_enemy.name} died.")
@@ -138,6 +149,8 @@ def main():
                         game_on = False
                     else:
                         cards = game.cards_to_shield(alice, current_enemy)
+
+                game.tavern_deck.discard_pile.extend(cards)
 
             else:
                 print("No more cards")
