@@ -51,10 +51,11 @@ class Player:
 
 class TavernDeck:
     def __init__(self, jesters=False):
-        self.deck = self._init_deck(jesters)
+        self.deck = TavernDeck.init_deck(jesters)
         self.discard_pile:list[Card] = []
 
-    def _init_deck(self, jesters) -> list[Card]:
+    @staticmethod
+    def init_deck(jesters) -> list[Card]:
         deck = []
         for suit in constants.suits:
             for i in range(1, 11):
