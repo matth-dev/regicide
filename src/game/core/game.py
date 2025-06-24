@@ -71,12 +71,6 @@ class RegicideGame:
         random.shuffle(self.tavern_deck.discard_pile)
         i = min(heal_value, len(self.tavern_deck.discard_pile))
         self.tavern_deck.deck.extend([card for card in [self.tavern_deck.discard_pile.pop() for _ in range(i)]])
-        # for _ in range(heal_value):
-        #     if self.tavern_deck.discard_pile:
-        #         self.tavern_deck.deck.append(self.tavern_deck.discard_pile.pop(random.randrange(0, len(self.tavern_deck.discard_pile))))
-        #     else:
-        #         print("No more cards in the discard pile")
-        #         break
 
     def draw_cards(self, draw_value):
         for player in cycle(self.players):
