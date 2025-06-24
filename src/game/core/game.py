@@ -68,17 +68,20 @@ class RegicideGame:
                 player.hand.extend(cards)
 
     def heal(self, heal_value):
-        for _ in range(heal_value):
-            if self.tavern_deck.discard_pile:
-                self.tavern_deck.deck.append(self.tavern_deck.discard_pile.pop(random.randrange(0, len(self.tavern_deck.discard_pile))))
-            else:
-                print("No more cards in the discard pile")
-                break
+        random.shuffle(self.tavern_deck.discard_pile)
+        i = min(heal_value, len(self.tavern_deck.discard_pile))
+        self.tavern_deck.deck.extend([card for card in [self.tavern_deck.discard_pile.pop() for _ in range(i)]])
+        # for _ in range(heal_value):
+        #     if self.tavern_deck.discard_pile:
+        #         self.tavern_deck.deck.append(self.tavern_deck.discard_pile.pop(random.randrange(0, len(self.tavern_deck.discard_pile))))
+        #     else:
+        #         print("No more cards in the discard pile")
+        #         break
 
     def draw_cards(self, draw_value):
         for player in cycle(self.players):
             if not all([len(p.hand) == self.max_hand_size for p in self.players]):
-                if (draw_value and self.tavern_deck.deck):
+                if draw_value and self.tavern_deck.deck:
                     if len(player.hand) < self.max_hand_size:
                         player.hand.append(self.tavern_deck.deck.pop(0))
                         draw_value -= 1
