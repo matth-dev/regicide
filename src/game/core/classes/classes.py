@@ -1,6 +1,9 @@
 import random
 from ...utils import constants
 from enum import Enum
+import time
+import itertools
+import random
 
 class Suit:
     def __init__(self, name:str, color:str):
@@ -8,22 +11,22 @@ class Suit:
         self.color = color
 
 class Card:
-    def __init__(self, value:int, suit:Suit):
+    def __init__(self, name:str, value:int, suit:Suit):
+        self.name = name
         self.value = value
         self.suit = suit
 
     def __str__(self):
-        return str(self.value)+self.suit.color
+        return str(self.name)+self.suit.color
 
 class Enemy(Card):
     def __init__(self, value:int, suit:Suit, health:int, name:str):
-        super().__init__(value, suit)
+        super().__init__(name, value, suit)
         self.health=health
-        self.name=name
         self.attack = value
-        self.immune = True
+        self.immune = random.choice([True, False])
 
-    def __str__(self):
+    def get_enemy_infos(self):
         return f"{self.name}{self.suit.color} // Attack: {str(self.attack)} // Health remaining: {self.health} // Immune: {self.immune}"
     
 class Player:
@@ -41,6 +44,13 @@ class Player:
         while True:
             print(self._show_hand())
             card_indexes = [(int(index) - 1) for index in input(f"Choose cards to play between 1 and {len(self.hand)}\n")]
+
+            # moves = [[0]]
+            # for i in range(1, 5):
+            #     moves.extend([combo for combo in itertools.combinations(range(1, len(self.hand)+1), i)])
+            # card_indexes = [(int(index) - 1) for index in random.choice(moves)]
+
+            print(f"Cards played: {[str(index+1) for index in card_indexes]}")
             try:
                 if not all(index >=-1 for index in card_indexes): raise IndexError
                 if -1 in card_indexes:
@@ -59,7 +69,7 @@ class TavernDeck:
         deck = []
         for suit in constants.suits:
             for i in range(1, 11):
-                deck.append(Card(value=i, suit=Suit(suit[0], suit[1])))
+                deck.append(Card(name=str(i), value=i, suit=Suit(name=suit[0], color=suit[1])))
         if jesters:
             pass
             # add jesters to deck

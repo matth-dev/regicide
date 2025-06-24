@@ -48,10 +48,11 @@ class RegicideGame:
     
     def cards_to_shield(self, player:Player, enemy:Enemy) -> list[Card]:
         while True:
-            print(enemy)
+            print(enemy.get_enemy_infos())
             print(f"Choose cards to shield yourself against the current enemy damage.")
             cards = player.choose_cards()
             if self.get_cards_value(cards) >= enemy.attack:
+                self.tavern_deck.discard_pile.extend(cards)
                 return cards
             else:
                 print("Not enough value to shield, please try again")
@@ -76,14 +77,15 @@ class RegicideGame:
 
     def draw_cards(self, draw_value):
         for player in cycle(self.players):
-            if (draw_value and self.tavern_deck.deck):
-                if len(player.hand) < self.max_hand_size:
-                    player.hand.append(self.tavern_deck.deck.pop(0))
-                    draw_value -= 1
+            if not all([len(p.hand) == self.max_hand_size for p in self.players]):
+                if (draw_value and self.tavern_deck.deck):
+                    if len(player.hand) < self.max_hand_size:
+                        player.hand.append(self.tavern_deck.deck.pop(0))
+                        draw_value -= 1
+                else:
+                    break
             else:
                 break
-
-
 
     def check_playability(self, cards:list[Card]) -> bool:
         values = [card.value for card in cards]
@@ -114,13 +116,16 @@ def main():
 
     game_on = True
 
+    kills = 0
     while game_on:
         current_enemy = None
         if game.enemies:
+            # ATTACK PHASE
             if not current_enemy: current_enemy = game.enemies[0]
             if alice.hand:
-                print(f"There are {len(game.tavern_deck.discard_pile)} cards in the discard pile")
-                print(current_enemy)
+                print(f"Tavern deck {len(game.tavern_deck.deck)}")
+                print(f"Discard Pile({len(game.tavern_deck.discard_pile)}): {[str(card) for card in game.tavern_deck.discard_pile]}")
+                print(current_enemy.get_enemy_infos())
                 cards = game.cards_to_attack(alice)
                 
                 heal_value, draw_value, damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
@@ -136,22 +141,28 @@ def main():
                 print(f"damage: {damage_value}, lower_attack: {lower_attack_value}")
                 current_enemy.health -= damage_value
                 current_enemy.attack -= lower_attack_value
-                print(len(cards))
-
-                if current_enemy.health <= 0:
-                    print(f"{current_enemy.name} died.")
-                    game.enemies.pop(0)
-                    current_enemy = game.enemies[0]
-
-                if current_enemy.attack > 0:
-                    if alice.get_hand_value() < current_enemy.attack:
-                        print("You can't shield. You lost")
-                        game_on = False
-                    else:
-                        cards = game.cards_to_shield(alice, current_enemy)
+                current_enemy.attack = max(0, current_enemy.attack)
 
                 game.tavern_deck.discard_pile.extend(cards)
 
+                if current_enemy.health <= 0:
+                    print(f"{current_enemy} died.")
+                    kills += 1
+                    if current_enemy.health == 0: game.tavern_deck.discard_pile.append(current_enemy)
+                    game.enemies.pop(0)
+                    current_enemy = game.enemies[0]
+                    continue
+                
+
+                # SHIELD PHASE
+                if current_enemy.attack > 0:
+                    if alice.get_hand_value() < current_enemy.attack:
+                        print("You can't shield")
+                        game_on = False
+                        break
+                    else:
+                        cards = game.cards_to_shield(alice, current_enemy)
+                
             else:
                 print("No more cards")
                 game_on = False
@@ -159,6 +170,7 @@ def main():
             print("You won")
             game_on = False
     print("Game Over")
+    print(f"Regents killed: {kills}")
 
 if __name__ == "__main__":
     main()

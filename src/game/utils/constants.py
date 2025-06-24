@@ -2,17 +2,17 @@ suits = [("Spade", "♠"), ("Heart", "♥"), ("Diamond", "♦"), ("Club", "♣")
 
 enemies_infos = [
     {
-        "name": "Jack",
+        "name": "J",
         "attack":10,
         "health": 20
     },
     {
-        "name": "Queen",
+        "name": "Q",
         "attack": 15,
         "health": 30
     },
     {
-        "name": "King",
+        "name": "K",
         "attack": 20,
         "health": 40
     }
