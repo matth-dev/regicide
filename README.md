@@ -88,13 +88,13 @@ card-game-ai/
 ## 🛠️ Installation
 
 ### Prerequisites
-- Python 3.8+
-- pip package manager
+- Python 3.13+
+- [UV](https://docs.astral.sh/uv/) package and project manager.
 
 ### Setup
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/card-game-ai.git
+git clone https://github.com/matth-dev/regicide.git
 cd card-game-ai
 
 # Create virtual environment
