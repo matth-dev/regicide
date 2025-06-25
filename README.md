@@ -26,9 +26,9 @@ This project implements a card game engine and trains an AI agent to play strate
 ## 🚀 Features
 
 ### Core Game Engine
-- [x] Card and deck classes
+- [x] Card, Regents(Enemies) and deck classes
 - [x] Player hand management with auto-sorting
-- [x] Game state tracking
+- [] Game state tracking
 - [ ] Move validation system
 - [ ] Scoring and win detection
 - [ ] Game history logging
@@ -50,39 +50,7 @@ This project implements a card game engine and trains an AI agent to play strate
 ## 📁 Project Structure
 
 ```
-card-game-ai/
-├── src/
-│   ├── game/
-│   │   ├── __init__.py
-│   │   ├── card.py              # Card and Deck classes
-│   │   ├── player.py            # Player management
-│   │   ├── game_engine.py       # Core game logic
-│   │   └── rules.py             # Game rules and validation
-│   ├── ai/
-│   │   ├── __init__.py
-│   │   ├── agent.py             # AI agent implementation
-│   │   ├── neural_network.py    # NN architecture
-│   │   ├── training.py          # Training loops
-│   │   └── evaluation.py        # Performance metrics
-│   └── ui/
-│       ├── __init__.py
-│       ├── cli.py               # Command-line interface
-│       └── visualizer.py        # Game state visualization
-├── data/
-│   ├── game_logs/               # Recorded gameplay
-│   ├── models/                  # Trained AI models
-│   └── training_data/           # Preprocessed training data
-├── tests/
-│   ├── test_game_engine.py
-│   ├── test_ai_agent.py
-│   └── test_integration.py
-├── docs/
-│   ├── game_rules.md
-│   ├── ai_architecture.md
-│   └── api_reference.md
-├── requirements.txt
-├── setup.py
-└── README.md
+wip
 ```
 
 ## 🛠️ Installation
@@ -95,17 +63,9 @@ card-game-ai/
 ```bash
 # Clone the repository
 git clone https://github.com/matth-dev/regicide.git
-cd card-game-ai
+cd regicide
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Install the package in development mode
-pip install -e .
+wip
 ```
 
 ## 🎯 Usage
@@ -218,8 +178,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ### Phase 1: Core Implementation (Weeks 1-4)
 - [x] Basic game engine
 - [ ] Complete rule implementation
-- [ ] CLI interface
-- [ ] Unit tests
+- [x] CLI interface
+- [ ] Solo-play
+- [ ] Tests
 
 ### Phase 2: AI Foundation (Weeks 5-8)
 - [ ] State representation design
