@@ -30,7 +30,7 @@ class RegicideGame:
     def _init_players_hand(self) -> None:
         for _ in range(0, self.max_hand_size):
             for player in self.players:
-                player.hand.append(self.tavern_deck.deck.pop())
+                player.add_cards([self.tavern_deck.deck.pop()])
 
     def get_cards_value(self, cards:list[Card]) -> int:
         return sum([card.value for card in cards])
@@ -56,7 +56,7 @@ class RegicideGame:
                 return cards
             else:
                 print("Not enough value to shield, please try again")
-                player.hand.extend(cards)
+                player.add_cards(cards=cards)
 
     def cards_to_attack(self, player:Player) -> list[Card]:
         while True:
@@ -65,7 +65,8 @@ class RegicideGame:
                 return cards
             else:
                 print("This move is not allowed.")
-                player.hand.extend(cards)
+                player.add_cards(cards=cards)
+
 
     def heal(self, heal_value):
         for _ in range(heal_value):
@@ -80,7 +81,7 @@ class RegicideGame:
             if not all([len(p.hand) == self.max_hand_size for p in self.players]):
                 if (draw_value and self.tavern_deck.deck):
                     if len(player.hand) < self.max_hand_size:
-                        player.hand.append(self.tavern_deck.deck.pop(0))
+                        player.add_cards([self.tavern_deck.deck.pop()])
                         draw_value -= 1
                 else:
                     break

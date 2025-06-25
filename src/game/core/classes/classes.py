@@ -32,7 +32,15 @@ class Enemy(Card):
 class Player:
     def __init__(self, name:str):
         self.name = name
-        self.hand:list[Card] = []
+        self._hand:list[Card] = []
+    
+    @property
+    def hand(self):
+        return self._hand
+    
+    def add_cards(self, cards:list[Card]):
+        self._hand.extend(cards)
+        self._hand.sort(key=lambda x: x.value)
 
     def _show_hand(self) -> list[str]:
         return [str(card) for card in self.hand]
