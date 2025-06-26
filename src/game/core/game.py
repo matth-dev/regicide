@@ -7,11 +7,12 @@ from typing import Optional
 class RegicideGame:
     def __init__(self, players:list[Player], jesters:bool = False):
         self.enemies = RegicideGame.init_enemies()
-        self.tavern_deck = TavernDeck(jesters=jesters)
         self.players = players
-        self.max_hand_size = 9 - len(self.players)
+        self.max_hand_size = 9 - len(players)
+        self.tavern_deck = TavernDeck(player_count=len(players))
         self.draw_cards(draw_value=(self.max_hand_size * len(players)))
 
+    # May move to helpers
     @staticmethod
     def init_enemies() -> list[Enemy]:
             enemy_deck:list[Enemy] = []
@@ -27,25 +28,22 @@ class RegicideGame:
 
             return enemy_deck
 
-    def _init_players_hand(self) -> None:
-        for _ in range(0, self.max_hand_size):
-            for player in self.players:
-                player.add_cards([self.tavern_deck.deck.pop()])
-
     def get_cards_value(self, cards:list[Card]) -> int:
         return sum([card.value for card in cards])
 
     def calculate_attack_value(self, enemy:Enemy, cards:list[Card]) -> tuple[int, int, int, int]:
-        suits_played = [card.suit.name for card in cards]
         value = self.get_cards_value(cards)
-        heal_value = value if "Heart" in suits_played and (enemy.immune == False or enemy.suit.name != "Heart") else 0
-        draw_value = value if "Diamond" in suits_played and (enemy.immune == False or enemy.suit.name != "Diamond") else 0
-        
-        lower_attack_value = value if "Spade" in suits_played and (enemy.immune == False or enemy.suit.name != "Spade") else 0
-        damage_value = value*2 if "Club" in suits_played and (enemy.immune == False or enemy.suit.name != "Club") else value
+        if value > 0:
+            suits_played = [card.suit.name for card in cards]
+            heal_value = value if "Heart" in suits_played and (enemy.immune == False or enemy.suit.name != "Heart") else 0
+            draw_value = value if "Diamond" in suits_played and (enemy.immune == False or enemy.suit.name != "Diamond") else 0
+            
+            lower_attack_value = value if "Spade" in suits_played and (enemy.immune == False or enemy.suit.name != "Spade") else 0
+            damage_value = value*2 if "Club" in suits_played and (enemy.immune == False or enemy.suit.name != "Club") else value
+            return heal_value, draw_value, damage_value, lower_attack_value
+        else:
+            return 0, 0, 0, 0
 
-        return heal_value, draw_value, damage_value, lower_attack_value
-    
     def cards_to_shield(self, player:Player, enemy:Enemy) -> list[Card]:
         while True:
             print(enemy.get_enemy_infos())
@@ -96,6 +94,9 @@ class RegicideGame:
             if len(set(values)) == 1:
                 # Check if total value inferior or equal to 10
                 if sum(values) <= 10:
+                    # Check for multiple jesters played together
+                    if sum(values) == 0:
+                        return False
                     return True
             else:
             # If cards have a different value
@@ -108,9 +109,9 @@ class RegicideGame:
 def main():
     alice = Player(name="Alice")
 
-    players: list[Player] = [alice]
+    players: list[Player] = [alice, alice, alice, alice]
 
-    game = RegicideGame(players=players, jesters=False)
+    game = RegicideGame(players=players)
 
     game_on = True
 
@@ -125,21 +126,27 @@ def main():
                 print(f"Discard Pile({len(game.tavern_deck.discard_pile)}): {[str(card) for card in game.tavern_deck.discard_pile]}")
                 print(current_enemy.get_enemy_infos())
                 cards = game.cards_to_attack(alice)
+
+                print(f"Cards played: {[str(card) for card in cards]}")
                 
                 heal_value, draw_value, damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
 
-                if heal_value:
-                    game.heal(heal_value)
-                    print(f"Heal: {heal_value}")
+                if damage_value == 0:
+                    current_enemy.immune == False
+                    continue
+                else:
+                    if heal_value:
+                        game.heal(heal_value)
+                        print(f"Heal: {heal_value}")
 
-                if draw_value:
-                    game.draw_cards(draw_value)
-                    print(f"Draw: {draw_value}")
+                    if draw_value:
+                        game.draw_cards(draw_value)
+                        print(f"Draw: {draw_value}")
 
-                print(f"damage: {damage_value}, lower_attack: {lower_attack_value}")
-                current_enemy.health -= damage_value
-                current_enemy.attack -= lower_attack_value
-                current_enemy.attack = max(0, current_enemy.attack)
+                    print(f"damage: {damage_value}, lower_attack: {lower_attack_value}")
+                    current_enemy.health -= damage_value
+                    current_enemy.attack -= lower_attack_value
+                    current_enemy.attack = max(0, current_enemy.attack)
 
                 game.tavern_deck.discard_pile.extend(cards)
 

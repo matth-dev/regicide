@@ -11,13 +11,16 @@ class Suit:
         self.color = color
 
 class Card:
-    def __init__(self, name:str, value:int, suit:Suit):
+    def __init__(self, name:str, value:int, suit:Suit | None):
         self.name = name
         self.value = value
         self.suit = suit
 
     def __str__(self):
-        return str(self.name)+self.suit.color
+        if self.suit:
+            return self.name+self.suit.color
+        else:
+            return self.name
 
 class Enemy(Card):
     def __init__(self, value:int, suit:Suit, health:int, name:str):
@@ -58,7 +61,6 @@ class Player:
             #     moves.extend([combo for combo in itertools.combinations(range(1, len(self.hand)+1), i)])
             # card_indexes = [(int(index) - 1) for index in random.choice(moves)]
 
-            print(f"Cards played: {[str(index+1) for index in card_indexes]}")
             try:
                 if not all(index >=-1 for index in card_indexes): raise IndexError
                 if -1 in card_indexes:
@@ -68,21 +70,20 @@ class Player:
                 print(f"Choose at least one existing card or press 0 to yield while in attack phase.")
 
 class TavernDeck:
-    def __init__(self, jesters=False):
-        self.deck = TavernDeck.init_deck(jesters)
+    def __init__(self, player_count:int):
+        self.deck = []
         self.discard_pile:list[Card] = []
+        self._create_deck(player_count)
 
-    @staticmethod
-    def init_deck(jesters) -> list[Card]:
-        deck = []
+    def _create_deck(self, player_count:int) -> list[Card]:
         for suit in constants.suits:
             for i in range(1, 11):
-                deck.append(Card(name=str(i), value=i, suit=Suit(name=suit[0], color=suit[1])))
-        if jesters:
-            pass
-            # add jesters to deck
-        random.shuffle(deck)
-        return deck
+                self.deck.append(Card(name=str(i), value=i, suit=Suit(name=suit[0], color=suit[1])))
+        if player_count >= 3:
+            jesters_count = player_count - 2
+            for _ in range(jesters_count):
+                self.deck.append(Card(name="S", value=0, suit=None))
+        random.shuffle(self.deck)
 
 class GamePhase(Enum):
     SETUP = "setup"
