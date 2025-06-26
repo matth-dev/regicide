@@ -83,6 +83,7 @@ class RegicideGame:
             else:
                 break
 
+    # May move to helpers
     def check_playability(self, cards:list[Card]) -> bool:
         values = [card.value for card in cards]
         # If at most one card is played, no need to check anything.
@@ -108,14 +109,23 @@ class RegicideGame:
 
 def main():
     alice = Player(name="Alice")
+    bob = Player(name="Bob")
+    kevin = Player(name="Kevin")
+    julie = Player(name="Julie")
 
-    players: list[Player] = [alice, alice, alice, alice]
+    players:list[Player] = [alice, bob, kevin, julie]
+
+    random.shuffle(players)
 
     game = RegicideGame(players=players)
 
     game_on = True
 
     kills = 0
+
+    player_index = players.index(random.choice(players))
+    player = players[player_index]
+
     while game_on:
         current_enemy = None
         if game.enemies:
@@ -128,13 +138,15 @@ def main():
                 cards = game.cards_to_attack(alice)
 
                 print(f"Cards played: {[str(card) for card in cards]}")
-                
-                heal_value, draw_value, damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
+                if not cards:
+                    print("You yield.")
+                elif "S" in [card.name for card in cards]:
+                    current_enemy.immune = False
+                    game.tavern_deck.discard_pile.extend(cards)
 
-                if damage_value == 0:
-                    current_enemy.immune == False
                     continue
                 else:
+                    heal_value, draw_value, damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
                     if heal_value:
                         game.heal(heal_value)
                         print(f"Heal: {heal_value}")
