@@ -106,6 +106,15 @@ class RegicideGame:
                     return True
         return False
 
+    def choose_next_player(self) -> int:
+        while True:
+            [print(player.show_player_infos()) for player in self.players]
+            index = int(input("Choose who is playing next:"))
+            try:
+                return index
+            except IndexError:
+                print("Please choose an existing index")
+
 
 def main():
     alice = Player(name="Alice")
@@ -123,19 +132,20 @@ def main():
 
     kills = 0
 
-    player_index = players.index(random.choice(players))
-    player = players[player_index]
+    index = 0
+    player = players[index]
 
     while game_on:
         current_enemy = None
         if game.enemies:
             # ATTACK PHASE
             if not current_enemy: current_enemy = game.enemies[0]
-            if alice.hand:
+            if player.hand:
                 print(f"Tavern deck {len(game.tavern_deck.deck)}")
                 print(f"Discard Pile({len(game.tavern_deck.discard_pile)}): {[str(card) for card in game.tavern_deck.discard_pile]}")
                 print(current_enemy.get_enemy_infos())
-                cards = game.cards_to_attack(alice)
+                print(f"It's your turn {player.name}")
+                cards = game.cards_to_attack(player)
 
                 print(f"Cards played: {[str(card) for card in cards]}")
                 if not cards:
@@ -143,7 +153,7 @@ def main():
                 elif "S" in [card.name for card in cards]:
                     current_enemy.immune = False
                     game.tavern_deck.discard_pile.extend(cards)
-
+                    player = players[game.choose_next_player()]
                     continue
                 else:
                     heal_value, draw_value, damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
@@ -173,12 +183,12 @@ def main():
 
                 # SHIELD PHASE
                 if current_enemy.attack > 0:
-                    if alice.get_hand_value() < current_enemy.attack:
+                    if player.get_hand_value() < current_enemy.attack:
                         print("You can't shield")
                         game_on = False
                         break
                     else:
-                        cards = game.cards_to_shield(alice, current_enemy)
+                        cards = game.cards_to_shield(player, current_enemy)
                 
             else:
                 print("No more cards")
@@ -186,6 +196,10 @@ def main():
         else:
             print("You won")
             game_on = False
+        index += 1
+        if index >= len(players):
+            index = index % len(players)
+        player = players[index]
     print("Game Over")
     print(f"Regents killed: {kills}")
 

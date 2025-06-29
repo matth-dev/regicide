@@ -69,6 +69,9 @@ class Player:
             except IndexError:
                 print(f"Choose at least one existing card or press 0 to yield while in attack phase.")
 
+    def show_player_infos(self) -> str:
+        return f"{self.name}({len(self.hand)})"
+
 class TavernDeck:
     def __init__(self, player_count:int):
         self.deck = []
