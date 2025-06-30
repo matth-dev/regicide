@@ -2,7 +2,6 @@ from .classes import *
 from ..utils import constants
 import random
 from itertools import cycle
-from typing import Optional
 
 class RegicideGame:
     def __init__(self, players:list[Player], jesters:bool = False):
@@ -10,7 +9,8 @@ class RegicideGame:
         self.players = players
         self.max_hand_size = 9 - len(players)
         self.tavern_deck = TavernDeck(player_count=len(players))
-        self.draw_cards(draw_value=(self.max_hand_size * len(players)))
+        self.player_index = 0
+        self.draw_cards(player_index=self.player_index, draw_value=(self.max_hand_size * len(players)))
 
     # May move to helpers
     @staticmethod
@@ -71,17 +71,15 @@ class RegicideGame:
         i = min(heal_value, len(self.tavern_deck.discard_pile))
         self.tavern_deck.deck.extend([card for card in [self.tavern_deck.discard_pile.pop() for _ in range(i)]])
 
-    def draw_cards(self, draw_value):
-        for player in cycle(self.players):
-            if not all([len(p.hand) == self.max_hand_size for p in self.players]):
-                if draw_value and self.tavern_deck.deck:
-                    if len(player.hand) < self.max_hand_size:
-                        player.add_cards([self.tavern_deck.deck.pop()])
-                        draw_value -= 1
-                else:
-                    break
-            else:
-                break
+    def draw_cards(self, draw_value:int):
+        while draw_value and not all([len(p.hand) == self.max_hand_size for p in self.players]) and self.tavern_deck.deck:
+            # TODO: Using self.player_index is not a good solution because we are modifying it and so the pace of the actual game (lol)
+            player = self.players[self.player_index]
+            if len(player.hand) < self.max_hand_size:
+                player.add_cards([self.tavern_deck.deck.pop()])
+                draw_value -= 1
+            self.player_index += 1
+
 
     # May move to helpers
     def check_playability(self, cards:list[Card]) -> bool:
@@ -133,8 +131,7 @@ def main():
 
     kills = 0
 
-    player_index = 0
-    player = players[player_index]
+    player = players[game.player_index]
 
     while game_on:
         current_enemy = None
@@ -164,7 +161,7 @@ def main():
                         print(f"Heal: {heal_value}")
 
                     if draw_value:
-                        game.draw_cards(draw_value)
+                        game.draw_cards(player_index=game.player_index, draw_value=draw_value)
                         print(f"Draw: {draw_value}")
 
                     print(f"damage: {damage_value}, lower_attack: {lower_attack_value}")
@@ -198,10 +195,10 @@ def main():
         else:
             print("You won")
             game_on = False
-        player_index += 1
-        if player_index >= len(players):
-            player_index = player_index % len(players)
-        player = players[player_index]
+        game.player_index += 1
+        if game.player_index >= len(players):
+            game.player_index = game.player_index % len(players)
+        player = players[game.player_index]
     print("Game Over")
     print(f"Regents killed: {kills}")
 
