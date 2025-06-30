@@ -109,12 +109,12 @@ class RegicideGame:
     def choose_next_player(self) -> int:
         while True:
             [print(f"{num}: {player.show_player_infos()}") for num, player in enumerate(self.players, 1)]
+            index = int(input("Choose who is playing next:"))
             try:
-                index = int(input("Choose who is playing next:"))
-                if index < 0 and index > len(self.players): raise IndexError
+                if 0 > index > len(self.players): raise IndexError
                 return index
             except IndexError:
-                print("Please choose an existing index")
+                print("Please choose an existing player")
 
 
 def main():
@@ -133,8 +133,8 @@ def main():
 
     kills = 0
 
-    index = 0
-    player = players[index]
+    player_index = 0
+    player = players[player_index]
 
     while game_on:
         current_enemy = None
@@ -154,7 +154,8 @@ def main():
                 elif "S" in [card.name for card in cards]:
                     current_enemy.immune = False
                     game.tavern_deck.discard_pile.extend(cards)
-                    player = players[game.choose_next_player() - 1]
+                    player_index = game.choose_next_player() - 1
+                    player = players[player_index]
                     continue
                 else:
                     heal_value, draw_value, damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
@@ -197,10 +198,10 @@ def main():
         else:
             print("You won")
             game_on = False
-        index += 1
-        if index >= len(players):
-            index = index % len(players)
-        player = players[index]
+        player_index += 1
+        if player_index >= len(players):
+            player_index = player_index % len(players)
+        player = players[player_index]
     print("Game Over")
     print(f"Regents killed: {kills}")
 
