@@ -108,9 +108,10 @@ class RegicideGame:
 
     def choose_next_player(self) -> int:
         while True:
-            [print(player.show_player_infos()) for player in self.players]
-            index = int(input("Choose who is playing next:"))
+            [print(f"{num}: {player.show_player_infos()}") for num, player in enumerate(self.players, 1)]
             try:
+                index = int(input("Choose who is playing next:"))
+                if index < 0 and index > len(self.players): raise IndexError
                 return index
             except IndexError:
                 print("Please choose an existing index")
@@ -153,7 +154,7 @@ def main():
                 elif "S" in [card.name for card in cards]:
                     current_enemy.immune = False
                     game.tavern_deck.discard_pile.extend(cards)
-                    player = players[game.choose_next_player()]
+                    player = players[game.choose_next_player() - 1]
                     continue
                 else:
                     heal_value, draw_value, damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
