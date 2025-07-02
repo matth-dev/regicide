@@ -1,3 +1,5 @@
+import time
+
 from .classes import *
 from ..utils import constants
 import random
@@ -10,7 +12,7 @@ class RegicideGame:
         self.max_hand_size = 9 - len(players)
         self.tavern_deck = TavernDeck(player_count=len(players))
         self.player_index = 0
-        self.draw_cards(player_index=self.player_index, draw_value=(self.max_hand_size * len(players)))
+        self.draw_cards(draw_value=(self.max_hand_size * len(players)))
 
     # May move to helpers
     @staticmethod
@@ -62,7 +64,8 @@ class RegicideGame:
             if self.check_playability(cards):
                 return cards
             else:
-                print("This move is not allowed.")
+                if not player.is_ai:
+                    print("This move is not allowed.")
                 player.add_cards(cards=cards)
 
 
@@ -72,13 +75,16 @@ class RegicideGame:
         self.tavern_deck.deck.extend([card for card in [self.tavern_deck.discard_pile.pop() for _ in range(i)]])
 
     def draw_cards(self, draw_value:int):
+        player_index = self.player_index
         while draw_value and not all([len(p.hand) == self.max_hand_size for p in self.players]) and self.tavern_deck.deck:
-            # TODO: Using self.player_index is not a good solution because we are modifying it and so the pace of the actual game (lol)
-            player = self.players[self.player_index]
+            player = self.players[player_index]
             if len(player.hand) < self.max_hand_size:
                 player.add_cards([self.tavern_deck.deck.pop()])
                 draw_value -= 1
-            self.player_index += 1
+
+            player_index += 1
+
+            if player_index >= len(self.players): player_index = 0
 
 
     # May move to helpers
@@ -105,6 +111,7 @@ class RegicideGame:
         return False
 
     def choose_next_player(self) -> int:
+        # TODO: I have no idea what happens if a bot has a Jester to play, my guess is that the input will trigger and the human player will have to choose for the bot
         while True:
             [print(f"{num}: {player.show_player_infos()}") for num, player in enumerate(self.players, 1)]
             index = int(input("Choose who is playing next:"))
@@ -116,14 +123,14 @@ class RegicideGame:
 
 
 def main():
-    alice = Player(name="Alice")
+    alice = Player(name="Alice", is_ai=False)
     bob = Player(name="Bob")
     kevin = Player(name="Kevin")
     julie = Player(name="Julie")
 
     players:list[Player] = [alice, bob, kevin, julie]
 
-    random.shuffle(players)
+    # random.shuffle(players)
 
     game = RegicideGame(players=players)
 
@@ -146,13 +153,14 @@ def main():
                 cards = game.cards_to_attack(player)
 
                 print(f"Cards played: {[str(card) for card in cards]}")
+                time.sleep(2)
                 if not cards:
                     print("You yield.")
                 elif "S" in [card.name for card in cards]:
                     current_enemy.immune = False
                     game.tavern_deck.discard_pile.extend(cards)
-                    player_index = game.choose_next_player() - 1
-                    player = players[player_index]
+                    game.player_index = game.choose_next_player() - 1
+                    player = players[game.player_index]
                     continue
                 else:
                     heal_value, draw_value, damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
@@ -161,7 +169,7 @@ def main():
                         print(f"Heal: {heal_value}")
 
                     if draw_value:
-                        game.draw_cards(player_index=game.player_index, draw_value=draw_value)
+                        game.draw_cards(draw_value=draw_value)
                         print(f"Draw: {draw_value}")
 
                     print(f"damage: {damage_value}, lower_attack: {lower_attack_value}")
@@ -196,8 +204,7 @@ def main():
             print("You won")
             game_on = False
         game.player_index += 1
-        if game.player_index >= len(players):
-            game.player_index = game.player_index % len(players)
+        if game.player_index >= len(players): game.player_index = 0
         player = players[game.player_index]
     print("Game Over")
     print(f"Regents killed: {kills}")

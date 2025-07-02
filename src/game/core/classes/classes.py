@@ -33,9 +33,10 @@ class Enemy(Card):
         return f"{self.name}{self.suit.color} // Attack: {str(self.attack)} // Health remaining: {self.health} // Immune: {self.immune}"
     
 class Player:
-    def __init__(self, name:str):
+    def __init__(self, name:str, is_ai:bool = True):
         self.name = name
         self._hand:list[Card] = []
+        self.is_ai = is_ai
     
     @property
     def hand(self):
@@ -53,13 +54,14 @@ class Player:
     
     def choose_cards(self) -> list[Card]:
         while True:
-            print(self._show_hand())
-            card_indexes = [(int(index) - 1) for index in input(f"Choose cards to play between 1 and {len(self.hand)}\n")]
-
-            # moves = [[0]]
-            # for i in range(1, 5):
-            #     moves.extend([combo for combo in itertools.combinations(range(1, len(self.hand)+1), i)])
-            # card_indexes = [(int(index) - 1) for index in random.choice(moves)]
+            if not self.is_ai:
+                print(self._show_hand())
+                card_indexes = [(int(index) - 1) for index in input(f"Choose cards to play between 1 and {len(self.hand)}\n")]
+            else:
+                moves = [[0]]
+                for i in range(1, 5):
+                    moves.extend([play for play in itertools.combinations(iterable=range(1, len(self.hand)+1), r=i)])
+                card_indexes = [(int(index) - 1) for index in random.choice(moves)]
 
             try:
                 if not all(index >=-1 for index in card_indexes): raise IndexError
