@@ -80,7 +80,7 @@ class TavernDeck:
         self.discard_pile:list[Card] = []
         self._create_deck(player_count)
 
-    def _create_deck(self, player_count:int) -> list[Card]:
+    def _create_deck(self, player_count:int):
         for suit in constants.suits:
             for i in range(1, 11):
                 self.deck.append(Card(name=str(i), value=i, suit=Suit(name=suit[0], color=suit[1])))
