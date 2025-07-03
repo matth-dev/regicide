@@ -1,9 +1,7 @@
 import time
-
 from .classes import *
 from ..utils import constants
 import random
-from itertools import cycle
 
 class RegicideGame:
     def __init__(self, players:list[Player], jesters:bool = False):
@@ -48,14 +46,14 @@ class RegicideGame:
 
     def cards_to_shield(self, player:Player, enemy:Enemy) -> list[Card]:
         while True:
-            print(enemy.get_enemy_infos())
-            print(f"Choose cards to shield yourself against the current enemy damage.")
+            # print(enemy.get_enemy_infos())
+            # print(f"Choose cards to shield yourself against the current enemy damage.")
             cards = player.choose_cards()
             if self.get_cards_value(cards) >= enemy.attack:
                 self.tavern_deck.discard_pile.extend(cards)
                 return cards
             else:
-                print("Not enough value to shield, please try again")
+                # print("Not enough value to shield, please try again")
                 player.add_cards(cards=cards)
 
     def cards_to_attack(self, player:Player) -> list[Card]:
@@ -64,8 +62,8 @@ class RegicideGame:
             if self.check_playability(cards):
                 return cards
             else:
-                if not player.is_ai:
-                    print("This move is not allowed.")
+                # if not player.is_ai:
+                    # print("This move is not allowed.")
                 player.add_cards(cards=cards)
 
 
@@ -112,7 +110,7 @@ class RegicideGame:
 
     def choose_next_player(self, player:Player) -> int:
         while True:
-            [print(f"{num}: {player.show_player_infos()}") for num, player in enumerate(self.players, 1)]
+            # [print(f"{num}: {player.show_player_infos()}") for num, player in enumerate(self.players, 1)]
             if not player.is_ai:
                 index = int(input("Choose who is playing next:"))
             else:
@@ -121,16 +119,17 @@ class RegicideGame:
                 if 0 > index > len(self.players): raise IndexError
                 return index
             except IndexError:
-                print("Please choose an existing player")
+                pass
+                # print("Please choose an existing player")
 
 
 def main():
     alice = Player(name="Alice", is_ai=True)
-    bob = Player(name="Bob")
-    kevin = Player(name="Kevin")
-    julie = Player(name="Julie")
+    # bob = Player(name="Bob")
+    # kevin = Player(name="Kevin")
+    # julie = Player(name="Julie")
 
-    players:list[Player] = [alice, bob, kevin, julie]
+    players:list[Player] = [alice]
 
     # random.shuffle(players)
 
@@ -148,16 +147,17 @@ def main():
             # ATTACK PHASE
             if not current_enemy: current_enemy = game.enemies[0]
             if player.hand:
-                print(f"Tavern deck {len(game.tavern_deck.deck)}")
-                print(f"Discard Pile({len(game.tavern_deck.discard_pile)}): {[str(card) for card in game.tavern_deck.discard_pile]}")
-                print(current_enemy.get_enemy_infos())
-                print(f"It's your turn {player.name}")
+                # print(f"Tavern deck {len(game.tavern_deck.deck)}")
+                # print(f"Discard Pile({len(game.tavern_deck.discard_pile)}): {[str(card) for card in game.tavern_deck.discard_pile]}")
+                # print(current_enemy.get_enemy_infos())
+                # print(f"It's your turn {player.name}")
                 cards = game.cards_to_attack(player)
 
-                print(f"Cards played: {[str(card) for card in cards]}")
+                # print(f"Cards played: {[str(card) for card in cards]}")
                 time.sleep(0.5)
                 if not cards:
-                    print("You yield.")
+                    pass
+                    # print("You yield.")
                 elif "S" in [card.name for card in cards]:
                     current_enemy.immune = False
                     game.tavern_deck.discard_pile.extend(cards)
@@ -168,13 +168,13 @@ def main():
                     heal_value, draw_value, damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
                     if heal_value:
                         game.heal(heal_value)
-                        print(f"Heal: {heal_value}")
+                        # print(f"Heal: {heal_value}")
 
                     if draw_value:
                         game.draw_cards(draw_value=draw_value)
-                        print(f"Draw: {draw_value}")
+                        # print(f"Draw: {draw_value}")
 
-                    print(f"damage: {damage_value}, lower_attack: {lower_attack_value}")
+                    # print(f"damage: {damage_value}, lower_attack: {lower_attack_value}")
                     current_enemy.health -= damage_value
                     current_enemy.attack -= lower_attack_value
                     current_enemy.attack = max(0, current_enemy.attack)
@@ -182,7 +182,7 @@ def main():
                 game.tavern_deck.discard_pile.extend(cards)
 
                 if current_enemy.health <= 0:
-                    print(f"{current_enemy} died.")
+                    # print(f"{current_enemy} died.")
                     kills += 1
                     if current_enemy.health == 0: game.tavern_deck.discard_pile.append(current_enemy)
                     game.enemies.pop(0)
@@ -193,22 +193,22 @@ def main():
                 # SHIELD PHASE
                 if current_enemy.attack > 0:
                     if player.get_hand_value() < current_enemy.attack:
-                        print("You can't shield")
+                        # print("You can't shield")
                         game_on = False
                         break
                     else:
                         cards = game.cards_to_shield(player, current_enemy)
                 
             else:
-                print("No more cards")
+                # print("No more cards")
                 game_on = False
         else:
-            print("You won")
+            # print("You won")
             game_on = False
         game.player_index += 1
         if game.player_index >= len(players): game.player_index = 0
         player = players[game.player_index]
-    print("Game Over")
+    # print("Game Over")
     print(f"Regents killed: {kills}")
 
 if __name__ == "__main__":

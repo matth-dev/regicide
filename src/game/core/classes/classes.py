@@ -1,7 +1,5 @@
-import random
 from ...utils import constants
 from enum import Enum
-import time
 import itertools
 import random
 
@@ -69,7 +67,8 @@ class Player:
                     return []
                 return [self.hand.pop(index) for index in sorted(card_indexes, reverse=True)]
             except IndexError:
-                print(f"Choose at least one existing card or press 0 to yield while in attack phase.")
+                pass
+                # print(f"Choose at least one existing card or press 0 to yield while in attack phase.")
 
     def show_player_infos(self) -> str:
         return f"{self.name}({len(self.hand)})"
