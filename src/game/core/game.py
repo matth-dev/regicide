@@ -110,11 +110,13 @@ class RegicideGame:
                     return True
         return False
 
-    def choose_next_player(self) -> int:
-        # TODO: I have no idea what happens if a bot has a Jester to play, my guess is that the input will trigger and the human player will have to choose for the bot
+    def choose_next_player(self, player:Player) -> int:
         while True:
             [print(f"{num}: {player.show_player_infos()}") for num, player in enumerate(self.players, 1)]
-            index = int(input("Choose who is playing next:"))
+            if not player.is_ai:
+                index = int(input("Choose who is playing next:"))
+            else:
+                index = random.randint(1, len(self.players))
             try:
                 if 0 > index > len(self.players): raise IndexError
                 return index
@@ -123,7 +125,7 @@ class RegicideGame:
 
 
 def main():
-    alice = Player(name="Alice", is_ai=False)
+    alice = Player(name="Alice", is_ai=True)
     bob = Player(name="Bob")
     kevin = Player(name="Kevin")
     julie = Player(name="Julie")
@@ -153,13 +155,13 @@ def main():
                 cards = game.cards_to_attack(player)
 
                 print(f"Cards played: {[str(card) for card in cards]}")
-                time.sleep(2)
+                time.sleep(0.5)
                 if not cards:
                     print("You yield.")
                 elif "S" in [card.name for card in cards]:
                     current_enemy.immune = False
                     game.tavern_deck.discard_pile.extend(cards)
-                    game.player_index = game.choose_next_player() - 1
+                    game.player_index = game.choose_next_player(player) - 1
                     player = players[game.player_index]
                     continue
                 else:
