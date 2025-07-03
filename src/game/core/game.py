@@ -210,8 +210,10 @@ def main():
         player = players[game.player_index]
     # print("Game Over")
     print(f"Regents killed: {kills}")
+    if kills >= 8:
+        input("wow")
 
 if __name__ == "__main__":
-    for i in range(1, 101):
+    for i in range(1, 1001):
         print(f"Playing game number {i}...")
         main()
