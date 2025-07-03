@@ -125,11 +125,11 @@ class RegicideGame:
 
 def main():
     alice = Player(name="Alice", is_ai=True)
-    # bob = Player(name="Bob")
-    # kevin = Player(name="Kevin")
-    # julie = Player(name="Julie")
+    bob = Player(name="Bob")
+    kevin = Player(name="Kevin")
+    julie = Player(name="Julie")
 
-    players:list[Player] = [alice]
+    players:list[Player] = [alice, bob, kevin, julie]
 
     # random.shuffle(players)
 
@@ -154,7 +154,7 @@ def main():
                 cards = game.cards_to_attack(player)
 
                 # print(f"Cards played: {[str(card) for card in cards]}")
-                time.sleep(0.5)
+
                 if not cards:
                     pass
                     # print("You yield.")
@@ -212,4 +212,6 @@ def main():
     print(f"Regents killed: {kills}")
 
 if __name__ == "__main__":
-    main()
+    for i in range(1, 101):
+        print(f"Playing game number {i}...")
+        main()
