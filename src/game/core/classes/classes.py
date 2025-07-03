@@ -58,7 +58,7 @@ class Player:
             else:
                 moves = [[0]]
                 for i in range(1, 5):
-                    moves.extend([play for play in itertools.combinations(iterable=range(1, len(self.hand)+1), r=i)])
+                    moves.extend([list(play) for play in itertools.combinations(iterable=range(1, len(self.hand)+1), r=i)])
                 card_indexes = [(int(index) - 1) for index in random.choice(moves)]
 
             try:
@@ -67,7 +67,7 @@ class Player:
                     return []
                 return [self.hand.pop(index) for index in sorted(card_indexes, reverse=True)]
             except IndexError:
-                pass
+                continue
                 # print(f"Choose at least one existing card or press 0 to yield while in attack phase.")
 
     def show_player_infos(self) -> str:

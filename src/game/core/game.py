@@ -89,6 +89,8 @@ class RegicideGame:
     def check_playability(self, cards:list[Card]) -> bool:
         values = [card.value for card in cards]
         # If at most one card is played, no need to check anything.
+        if not values:
+            return True
         if len(values) <= 1:
             return True
         else:
@@ -214,6 +216,6 @@ def main():
         input("wow")
 
 if __name__ == "__main__":
-    for i in range(1, 1001):
+    for i in range(1, 20000):
         print(f"Playing game number {i}...")
         main()
