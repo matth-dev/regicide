@@ -46,9 +46,12 @@ class RegicideGame:
 
     def cards_to_shield(self, player:Player, enemy:Enemy) -> list[Card]:
         while True:
+            # print(player.get_hand_value())
+            # print(enemy.attack)
             # print(enemy.get_enemy_infos())
             # print(f"Choose cards to shield yourself against the current enemy damage.")
             cards = player.choose_cards()
+            # print([str(card) for card in cards])
             if self.get_cards_value(cards) >= enemy.attack:
                 self.tavern_deck.discard_pile.extend(cards)
                 return cards
@@ -89,9 +92,8 @@ class RegicideGame:
     def check_playability(self, cards:list[Card]) -> bool:
         values = [card.value for card in cards]
         # If at most one card is played, no need to check anything.
-        if not values:
-            return True
-        if len(values) <= 1:
+        # print([str(card) for card in cards])
+        if len(cards) <= 1:
             return True
         else:
         # If multiples cards are played

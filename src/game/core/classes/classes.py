@@ -51,15 +51,19 @@ class Player:
         return sum([card.value for card in self.hand])
     
     def choose_cards(self) -> list[Card]:
+        # print(self._show_hand())
         while True:
             if not self.is_ai:
                 print(self._show_hand())
                 card_indexes = [(int(index) - 1) for index in input(f"Choose cards to play between 1 and {len(self.hand)}\n")]
             else:
-                moves = [[0]]
-                for i in range(1, 5):
-                    moves.extend([list(play) for play in itertools.combinations(iterable=range(1, len(self.hand)+1), r=i)])
-                card_indexes = [(int(index) - 1) for index in random.choice(moves)]
+                moves = [[-1]]
+                # Number of cards we can play (can be all player hand when shielding)
+                for i in range(1, len(self.hand) + 1):
+                    # The iterable we use for combinations is [0, 1, 2, n] where n is the len of the player hand
+                    # The first pass will be [0, 1, 2, n] then [01, 02, 0n, 12, 1n, 2n] etc... (I may have forgot some examples here) 
+                    moves.extend([list(play) for play in itertools.combinations(iterable=range(0, len(self.hand)), r=i)])
+                card_indexes = [(int(index)) for index in random.choice(moves)]
 
             try:
                 if not all(index >=-1 for index in card_indexes): raise IndexError
