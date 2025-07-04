@@ -1,4 +1,4 @@
-# Regicide - Kings and Robots
+# Regicide - Regents and Robots
 
 A Python implementation of Regicide with AI training capabilities using reinforcement learning.
 
@@ -71,28 +71,8 @@ wip
 ## 🎯 Usage
 
 ### Playing the Game
-```bash
-# Human vs Human
-python -m src.ui.cli --mode human
-
-# Human vs AI
-python -m src.ui.cli --mode vs-ai --ai-model models/best_model.pkl
-
-# AI vs AI (for testing)
-python -m src.ui.cli --mode ai-vs-ai
-```
 
 ### Training the AI
-```bash
-# Start training from scratch
-python -m src.ai.training --episodes 10000 --save-interval 1000
-
-# Resume training from checkpoint
-python -m src.ai.training --load-model models/checkpoint_5000.pkl --episodes 5000
-
-# Evaluate trained model
-python -m src.ai.evaluation --model models/best_model.pkl --games 1000
-```
 
 ## 🧠 AI Architecture
 
@@ -149,20 +129,6 @@ python -m src.ai.evaluation --model models/best_model.pkl --games 1000
 - [ ] Transfer learning experiments
 - [ ] Human gameplay analysis
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-- Follow PEP 8 style guidelines
-- Add tests for new features
-- Update documentation for API changes
-- Use type hints where appropriate
-
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -171,7 +137,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Relevant papers or resources]
 - [Inspiration from other projects]
-- [Special thanks to contributors]
 
 ## 📈 Roadmap
 

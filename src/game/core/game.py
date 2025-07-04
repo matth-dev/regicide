@@ -46,7 +46,7 @@ class RegicideGame:
         while True:
             # print(player.get_hand_value())
             # print(enemy.attack)
-            print(enemy.get_enemy_infos())
+            # print(enemy.get_enemy_infos())
             # print(f"Choose cards to shield yourself against the current enemy damage.")
             cards = player.choose_cards()
             # print([str(card) for card in cards])
