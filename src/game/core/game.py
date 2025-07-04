@@ -1,32 +1,30 @@
-import time
 from .classes import *
 from ..utils import constants
 import random
 
 class RegicideGame:
-    def __init__(self, players:list[Player], jesters:bool = False):
-        self.enemies = RegicideGame.init_enemies()
+    def __init__(self, players:list[Player]):
+        self.enemies = self._create_enemies()
         self.players = players
-        self.max_hand_size = 9 - len(players)
-        self.tavern_deck = TavernDeck(player_count=len(players))
+        self.player_count = len(self.players)
+        self.max_hand_size = 9 - self.player_count
+        self.tavern_deck = TavernDeck(player_count=self.player_count)
         self.player_index = 0
-        self.draw_cards(draw_value=(self.max_hand_size * len(players)))
+        self.draw_cards(draw_value=(self.max_hand_size * self.player_count))
 
-    # May move to helpers
-    @staticmethod
-    def init_enemies() -> list[Enemy]:
-            enemy_deck:list[Enemy] = []
+    def _create_enemies(self):
+        enemies:list[Enemy] = []
 
-            for enemy in constants.enemies_infos:
-                enemies_color:list[Enemy] = []
+        for enemy in constants.ENEMIES:
+            face_set:list[Enemy] = []
 
-                for suit in constants.suits:
-                    enemies_color.append(Enemy(value=enemy["attack"], suit=Suit(name=suit[0], color=suit[1]), health=enemy["health"], name=enemy["name"]))
+            for suit in constants.SUITS:
+                face_set.append(Enemy(value=enemy["attack"], suit=Suit(name=suit[0], symbol=suit[1]), health=enemy["health"], name=enemy["name"]))
 
-                random.shuffle(enemies_color)
-                enemy_deck.extend(enemies_color)
+            random.shuffle(face_set)
+            enemies.extend(face_set)
 
-            return enemy_deck
+        return enemies
 
     def get_cards_value(self, cards:list[Card]) -> int:
         return sum([card.value for card in cards])
@@ -48,7 +46,7 @@ class RegicideGame:
         while True:
             # print(player.get_hand_value())
             # print(enemy.attack)
-            # print(enemy.get_enemy_infos())
+            print(enemy.get_enemy_infos())
             # print(f"Choose cards to shield yourself against the current enemy damage.")
             cards = player.choose_cards()
             # print([str(card) for card in cards])
@@ -214,10 +212,10 @@ def main():
         player = players[game.player_index]
     # print("Game Over")
     print(f"Regents killed: {kills}")
-    if kills >= 8:
+    if kills >= 6:
         input("wow")
 
 if __name__ == "__main__":
-    for i in range(1, 20000):
+    for i in range(1, 2):
         print(f"Playing game number {i}...")
         main()

@@ -4,9 +4,12 @@ import itertools
 import random
 
 class Suit:
-    def __init__(self, name:str, color:str):
+    def __init__(self, name:str, symbol:str):
         self.name = name
-        self.color = color
+        self.symbol = symbol
+
+    def __str__(self):
+        return self.symbol
 
 class Card:
     def __init__(self, name:str, value:int, suit:Suit | None):
@@ -16,7 +19,7 @@ class Card:
 
     def __str__(self):
         if self.suit:
-            return self.name+self.suit.color
+            return self.name+self.suit.symbol
         else:
             return self.name
 
@@ -25,10 +28,10 @@ class Enemy(Card):
         super().__init__(name, value, suit)
         self.health=health
         self.attack = value
-        self.immune = random.choice([True, False])
+        self.immune = True
 
     def get_enemy_infos(self):
-        return f"{self.name}{self.suit.color} // Attack: {str(self.attack)} // Health remaining: {self.health} // Immune: {self.immune}"
+        return f"{self.name}{self.suit} // Attack: {str(self.attack)} // Health remaining: {self.health} // Immune: {self.immune}"
     
 class Player:
     def __init__(self, name:str, is_ai:bool = True):
@@ -84,9 +87,9 @@ class TavernDeck:
         self._create_deck(player_count)
 
     def _create_deck(self, player_count:int):
-        for suit in constants.suits:
+        for suit in constants.SUITS:
             for i in range(1, 11):
-                self.deck.append(Card(name=str(i), value=i, suit=Suit(name=suit[0], color=suit[1])))
+                self.deck.append(Card(name=str(i), value=i, suit=Suit(name=suit[0], symbol=suit[1])))
         if player_count >= 3:
             jesters_count = player_count - 2
             for _ in range(jesters_count):
