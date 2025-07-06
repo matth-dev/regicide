@@ -53,7 +53,7 @@ class Player:
     def get_hand_value(self) -> int:
         return sum([card.value for card in self.hand])
     
-    def choose_cards(self) -> list[Card]:
+    def choose_cards(self) -> list[Card] | None:
         # print(self._show_hand())
         while True:
             if not self.is_ai:
