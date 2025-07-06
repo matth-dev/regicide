@@ -26,11 +26,13 @@ class RegicideGame:
 
         return enemies
 
-    def get_cards_value(self, cards:list[Card]) -> int:
+    @staticmethod
+    def get_cards_value(cards:list[Card]) -> int:
         return sum([card.value for card in cards])
 
-    def calculate_attack_value(self, enemy:Enemy, cards:list[Card]) -> tuple[int, int, int, int]:
-        value = self.get_cards_value(cards)
+    @staticmethod
+    def calculate_attack_value(enemy:Enemy, cards:list[Card]) -> tuple[int, int, int, int]:
+        value = RegicideGame.get_cards_value(cards)
         if value > 0:
             suits_played = [card.suit.name for card in cards]
             heal_value = value if "Heart" in suits_played and (enemy.immune == False or enemy.suit.name != "Heart") else 0
@@ -60,7 +62,7 @@ class RegicideGame:
     def cards_to_attack(self, player:Player) -> list[Card]:
         while True:
             cards = player.choose_cards()
-            if self.check_playability(cards):
+            if RegicideGame.check_playability(cards):
                 return cards
             else:
                 # if not player.is_ai:
@@ -86,8 +88,8 @@ class RegicideGame:
             if player_index >= len(self.players): player_index = 0
 
 
-    # May move to helpers
-    def check_playability(self, cards:list[Card]) -> bool:
+    @staticmethod
+    def check_playability(cards:list[Card]) -> bool:
         values = [card.value for card in cards]
         # If at most one card is played, no need to check anything.
         # print([str(card) for card in cards])
@@ -149,8 +151,8 @@ def main():
             # ATTACK PHASE
             if not current_enemy: current_enemy = game.enemies[0]
             if player.hand:
-                # print(f"Tavern deck {len(game.tavern_deck.deck)}")
-                # print(f"Discard Pile({len(game.tavern_deck.discard_pile)}): {[str(card) for card in game.tavern_deck.discard_pile]}")
+                # print(f"Tavern deck {len(regicide.tavern_deck.deck)}")
+                # print(f"Discard Pile({len(regicide.tavern_deck.discard_pile)}): {[str(card) for card in regicide.tavern_deck.discard_pile]}")
                 # print(current_enemy.get_enemy_infos())
                 # print(f"It's your turn {player.name}")
                 cards = game.cards_to_attack(player)
@@ -167,7 +169,7 @@ def main():
                     player = players[game.player_index]
                     continue
                 else:
-                    heal_value, draw_value, damage_value, lower_attack_value = game.calculate_attack_value(current_enemy, cards)
+                    heal_value, draw_value, damage_value, lower_attack_value = RegicideGame.calculate_attack_value(current_enemy, cards)
                     if heal_value:
                         game.heal(heal_value)
                         # print(f"Heal: {heal_value}")
@@ -216,6 +218,6 @@ def main():
         input("wow")
 
 if __name__ == "__main__":
-    for i in range(1, 2):
+    for i in range(1, 1001):
         print(f"Playing game number {i}...")
         main()
