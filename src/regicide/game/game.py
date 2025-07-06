@@ -10,7 +10,7 @@ class RegicideGame:
         self.max_hand_size = 9 - self.player_count
         self.tavern_deck = TavernDeck(player_count=self.player_count)
         self.player_index = 0
-        self.draw_cards(draw_value=(self.max_hand_size * self.player_count))
+        self.deal_cards(draw_value=(self.max_hand_size * self.player_count))
 
     def _create_enemies(self):
         enemies:list[Enemy] = []
@@ -44,7 +44,8 @@ class RegicideGame:
         else:
             return 0, 0, 0, 0
 
-    def cards_to_shield(self, player:Player, enemy:Enemy) -> list[Card]:
+    @staticmethod
+    def cards_to_shield(player:Player, enemy:Enemy) -> list[Card]:
         while True:
             # print(player.get_hand_value())
             # print(enemy.attack)
@@ -52,14 +53,14 @@ class RegicideGame:
             # print(f"Choose cards to shield yourself against the current enemy damage.")
             cards = player.choose_cards()
             # print([str(card) for card in cards])
-            if self.get_cards_value(cards) >= enemy.attack:
-                self.tavern_deck.discard_pile.extend(cards)
+            if RegicideGame.get_cards_value(cards) >= enemy.attack:
                 return cards
             else:
                 # print("Not enough value to shield, please try again")
                 player.add_cards(cards=cards)
 
-    def cards_to_attack(self, player:Player) -> list[Card]:
+    @staticmethod
+    def cards_to_attack(player:Player) -> list[Card]:
         while True:
             cards = player.choose_cards()
             if RegicideGame.check_playability(cards):
@@ -70,17 +71,17 @@ class RegicideGame:
                 player.add_cards(cards=cards)
 
 
-    def heal(self, heal_value):
+    def heal(self, maximum_heal_value):
         random.shuffle(self.tavern_deck.discard_pile)
-        i = min(heal_value, len(self.tavern_deck.discard_pile))
-        self.tavern_deck.deck.extend([card for card in [self.tavern_deck.discard_pile.pop() for _ in range(i)]])
+        heal_value = min(maximum_heal_value, len(self.tavern_deck.discard_pile))
+        self.tavern_deck.deck.extend([card for card in [self.tavern_deck.discard_pile.pop() for _ in range(heal_value)]])
 
-    def draw_cards(self, draw_value:int):
+    def deal_cards(self, draw_value:int):
         player_index = self.player_index
         while draw_value and not all([len(p.hand) == self.max_hand_size for p in self.players]) and self.tavern_deck.deck:
             player = self.players[player_index]
             if len(player.hand) < self.max_hand_size:
-                player.add_cards([self.tavern_deck.deck.pop()])
+                player.add_cards([self.tavern_deck.deck.pop(0)])
                 draw_value -= 1
 
             player_index += 1
@@ -90,27 +91,25 @@ class RegicideGame:
 
     @staticmethod
     def check_playability(cards:list[Card]) -> bool:
-        values = [card.value for card in cards]
         # If at most one card is played, no need to check anything.
-        # print([str(card) for card in cards])
         if len(cards) <= 1:
             return True
+
+        values = [card.value for card in cards]
+
+        # TODO: review this part
+        # If all cards have the same value
+        if len(set(values)) == 1:
+            # Check if total value inferior or equal to 10
+            if sum(values) <= 10:
+                # Check for multiple jesters played together
+                if sum(values) == 0:
+                    return False
+                return True
         else:
-        # If multiples cards are played
-            # If all cards have the same value
-            if len(set(values)) == 1:
-                # Check if total value inferior or equal to 10
-                if sum(values) <= 10:
-                    # Check for multiple jesters played together
-                    if sum(values) == 0:
-                        return False
-                    return True
-            else:
             # If cards have a different value
-                # Check that only two cards are played and contains an animal companion (Aces)
-                if len(values) == 2 and 1 in values:
-                    return True
-        return False
+            # Check that only two cards are played and contains an animal companion (Aces)
+            return True if len(values) == 2 and 1 in values else False
 
     def choose_next_player(self, player:Player) -> int:
         while True:
@@ -128,7 +127,7 @@ class RegicideGame:
 
 
 def main():
-    alice = Player(name="Alice", is_ai=True)
+    alice = Player(name="Alice", is_ai=False)
     bob = Player(name="Bob")
     kevin = Player(name="Kevin")
     julie = Player(name="Julie")
@@ -152,7 +151,7 @@ def main():
             if not current_enemy: current_enemy = game.enemies[0]
             if player.hand:
                 # print(f"Tavern deck {len(regicide.tavern_deck.deck)}")
-                # print(f"Discard Pile({len(regicide.tavern_deck.discard_pile)}): {[str(card) for card in regicide.tavern_deck.discard_pile]}")
+                # print(f"Discard Pile({len(game.tavern_deck.discard_pile)}): {[str(card) for card in game.tavern_deck.discard_pile]}")
                 # print(current_enemy.get_enemy_infos())
                 # print(f"It's your turn {player.name}")
                 cards = game.cards_to_attack(player)
@@ -171,11 +170,11 @@ def main():
                 else:
                     heal_value, draw_value, damage_value, lower_attack_value = RegicideGame.calculate_attack_value(current_enemy, cards)
                     if heal_value:
-                        game.heal(heal_value)
+                        game.heal(maximum_heal_value=heal_value)
                         # print(f"Heal: {heal_value}")
 
                     if draw_value:
-                        game.draw_cards(draw_value=draw_value)
+                        game.deal_cards(draw_value=draw_value)
                         # print(f"Draw: {draw_value}")
 
                     # print(f"damage: {damage_value}, lower_attack: {lower_attack_value}")
@@ -201,7 +200,8 @@ def main():
                         game_on = False
                         break
                     else:
-                        cards = game.cards_to_shield(player, current_enemy)
+                        cards = RegicideGame.cards_to_shield(player, current_enemy)
+                        game.tavern_deck.discard_pile.extend(cards)
                 
             else:
                 # print("No more cards")
@@ -214,10 +214,8 @@ def main():
         player = players[game.player_index]
     # print("Game Over")
     print(f"Regents killed: {kills}")
-    if kills >= 6:
+    if kills >= 7:
         input("wow")
 
 if __name__ == "__main__":
-    for i in range(1, 1001):
-        print(f"Playing game number {i}...")
-        main()
+    main()
