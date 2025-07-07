@@ -37,8 +37,6 @@ wip
 git clone https://github.com/matth-dev/regicide.git
 cd regicide
 uv sync
-
-wip
 ```
 
 ## 🎯 Usage
