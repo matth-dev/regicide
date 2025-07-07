@@ -126,12 +126,13 @@ class RegicideGame:
     def show_game_infos(self, enemy:Enemy) -> None:
         enemy_infos = enemy.get_enemy_infos()
         tavern_deck_infos = f"Tavern Deck ({len(self.tavern_deck.deck)})| Discard Pile({len(self.tavern_deck.discard_pile)}): {[str(card) for card in self.tavern_deck.discard_pile]}"
-
+        player_cards_infos = [f"{player.name}({len(player.hand)})" for player in self.players] 
         print(enemy_infos)
         print(tavern_deck_infos)
+        print(player_cards_infos)
 
 def main():
-    alice = Player(name="Alice", is_ai=False)
+    alice = Player(name="Alice", is_ai=True)
     bob = Player(name="Bob")
     kevin = Player(name="Kevin")
     julie = Player(name="Julie")
@@ -158,7 +159,7 @@ def main():
                 cards = game.cards_to_attack(player)
 
                 if not cards:
-                    print("You yield")
+                    print(f"{player.name} yield")
                     pass
                 elif "S" in [card.name for card in cards]:
                     print(f"{player.name} played a Jester!")
@@ -177,10 +178,11 @@ def main():
 
                     
                     current_enemy.health -= damage_value
-                    current_enemy.health = max(0, current_enemy.health)
                     current_enemy.attack -= lower_attack_value
                     current_enemy.attack = max(0, current_enemy.attack)
                     # Probably could use setter to set min hp and attack to 0 here
+
+                    print(f"{player.name} played {[str(card) for card in cards]}")
 
                 game.tavern_deck.discard_pile.extend(cards)
 

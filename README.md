@@ -1,51 +1,23 @@
 # Regicide - Regents and Robots
 
-A Python implementation of Regicide with AI training capabilities using reinforcement learning.
+A Python implementation of the card game [Regicide](https://www.regicidegame.com) 
 
 ## 🎯 Project Overview
 
-This project implements a card game engine and trains an AI agent to play strategically using machine learning techniques. The goal is to create an AI that can learn optimal play strategies through self-play and human gameplay data.
+This project is the implementation of an existing card game called Regicide in python. 
+The goal of this project is to then train AI agents to play this game with machine learning and/or deep-learning (Most probably with the [Gymnasium](https://gymnasium.farama.org/index.html#) API).
+
+This repo is the first part of an on-going project but can be launched independently
 
 ## 🎮 Game Description
 
 ### Basic Rules
-- **Players**: 2-4 players
+- **Players**: 2-4 players (Can be played as one player but it's very hard since I decided to not implement the Jester mechanics for solo play)
 - **Deck**: Standard 52-card deck
-- **Objective**: [Describe the winning condition]
-- **Gameplay**: [Brief description of core mechanics]
+- **Objective**: Kill all Regents (Face Cards)
+- **Gameplay**: There are a total of 12 face cards to defeat (4 Jacks, Queens and Kings), each with their own health and attacks. Each turn a player choose a combination of cards to attack the current regent (or skip his/her turn) and then discard cards to mitigate the current regent' attack. The game is over if a player cannot discard enough card or when all regents are defeated (This is called a Regicide).
 
-[Rules](https://www.regicidegame.com/site_files/33132/upload_files/RegicideRulesA4.pdf)
-
-### Key Mechanics
-- [ ] Card dealing and hand management
-- [ ] Turn-based play system
-- [ ] Scoring system
-- [ ] Win/loss conditions
-- [ ] Special rules or combinations
-
-## 🚀 Features
-
-### Core Game Engine
-- [x] Card, Regents(Enemies) and deck classes
-- [x] Player hand management with auto-sorting
-- [] Game state tracking
-- [ ] Move validation system
-- [ ] Scoring and win detection
-- [ ] Game history logging
-
-### AI Components
-- [ ] Game state representation
-- [ ] Action space definition
-- [ ] Reward system design
-- [ ] Neural network architecture
-- [ ] Training pipeline
-- [ ] Performance evaluation
-
-### User Interface
-- [ ] Command-line interface
-- [ ] Game visualization
-- [ ] Human vs AI gameplay
-- [ ] Training progress monitoring
+Find all the (better explained) [Rules](https://www.regicidegame.com/site_files/33132/upload_files/RegicideRulesA4.pdf).
 
 ## 📁 Project Structure
 
@@ -64,6 +36,7 @@ wip
 # Clone the repository
 git clone https://github.com/matth-dev/regicide.git
 cd regicide
+uv sync
 
 wip
 ```
@@ -72,105 +45,13 @@ wip
 
 ### Playing the Game
 
-### Training the AI
+Do the following commands to play the game (You'll play as Alice)
 
-## 🧠 AI Architecture
+```bash
+cd regicide
+uv run -m src.regicide.game.game
+```
 
-### State Representation
-- **Hand encoding**: [Describe how cards are represented]
-- **Game state**: [Public information, turn phase, etc.]
-- **History**: [Previous moves, if relevant]
+## 🤖 AI & Gymnasium Integration
 
-### Action Space
-- **Pass**: Skip turn (action 0)
-- **Play cards**: Combinations of 1-4 cards (actions 1-N)
-- **Total actions**: [Number based on hand size]
-
-### Reward System
-- **Immediate rewards**: [Points for successful plays]
-- **Game completion**: [Win/loss bonuses]
-- **Strategic bonuses**: [Penalties for poor play]
-
-### Training Approach
-- **Algorithm**: [PPO, DQN, A3C, etc.]
-- **Self-play**: AI trains against previous versions
-- **Curriculum learning**: Progressive difficulty increase
-- **Experience replay**: Learning from past games
-
-## 📊 Performance Metrics
-
-### Training Metrics
-- Win rate against random player
-- Win rate against rule-based AI
-- Average game length
-- Training loss curves
-
-### Evaluation Benchmarks
-- [ ] Random baseline: [Target win rate]
-- [ ] Rule-based AI: [Target win rate]
-- [ ] Human players: [Target performance]
-- [ ] Previous model versions: [Improvement tracking]
-
-## 🔬 Experiments
-
-### Completed
-- [ ] Baseline random agent implementation
-- [ ] Rule-based heuristic agent
-- [ ] Basic neural network architecture
-
-### In Progress
-- [ ] Deep Q-Network (DQN) implementation
-- [ ] Hyperparameter tuning
-- [ ] Self-play training loop
-
-### Planned
-- [ ] Advanced architectures (Transformer, CNN)
-- [ ] Multi-agent training environments
-- [ ] Transfer learning experiments
-- [ ] Human gameplay analysis
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Relevant papers or resources]
-- [Inspiration from other projects]
-
-## 📈 Roadmap
-
-### Phase 1: Core Implementation (Weeks 1-4)
-- [x] Basic game engine
-- [ ] Complete rule implementation
-- [x] CLI interface
-- [ ] Solo-play
-- [ ] Tests
-
-### Phase 2: AI Foundation (Weeks 5-8)
-- [ ] State representation design
-- [ ] Basic AI agent
-- [ ] Training infrastructure
-- [ ] Evaluation framework
-
-### Phase 3: Advanced AI (Weeks 9-12)
-- [ ] Deep learning models
-- [ ] Self-play training
-- [ ] Performance optimization
-- [ ] Comprehensive evaluation
-
-### Phase 4: Polish & Analysis (Weeks 13-16)
-- [ ] Advanced visualizations
-- [ ] Strategy analysis tools
-- [ ] Documentation completion
-- [ ] Performance benchmarking
-
-## 📞 Contact
-
-Your Name - your.email@example.com
-
-Project Link: [https://github.com/yourusername/card-game-ai](https://github.com/yourusername/card-game-ai)
-
----
-
-*Last updated: [Current Date]*
+This project is designed to be extended with AI agents using the [Gymnasium](https://gymnasium.farama.org/) API. Stay tuned for updates!
