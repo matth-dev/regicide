@@ -132,7 +132,7 @@ class RegicideGame:
         print(player_cards_infos)
 
 def main():
-    alice = Player(name="Alice", is_ai=True)
+    alice = Player(name="Alice", is_ai=False)
     bob = Player(name="Bob")
     kevin = Player(name="Kevin")
     julie = Player(name="Julie")
