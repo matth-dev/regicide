@@ -1,4 +1,4 @@
-from ...utils import constants
+from src.regicide.utils import constants
 from enum import Enum
 import itertools
 import random
@@ -54,10 +54,9 @@ class Player:
         return sum([card.value for card in self.hand])
     
     def choose_cards(self) -> list[Card] | None:
-        # print(self._show_hand())
         while True:
             if not self.is_ai:
-                print(self._show_hand())
+                print(f"{self.name}:", self._show_hand())
                 card_indexes = [(int(index) - 1) for index in input(f"Choose cards to play between 1 and {len(self.hand)}\n")]
             else:
                 moves = [[-1]]
@@ -74,8 +73,8 @@ class Player:
                     return []
                 return [self.hand.pop(index) for index in sorted(card_indexes, reverse=True)]
             except IndexError:
+                print("Please choose existing cards")
                 continue
-                # print(f"Choose at least one existing card or press 0 to yield while in attack phase.")
 
     def show_player_infos(self) -> str:
         return f"{self.name}({len(self.hand)})"
@@ -96,13 +95,13 @@ class TavernDeck:
                 self.deck.append(Card(name="S", value=0, suit=None))
         random.shuffle(self.deck)
 
-class GamePhase(Enum):
-    SETUP = "setup"
-    PLAYER_TURN = "player_turn"
-    CARD_POWER = "card_power"
-    ENEMY_TURN = "enemy_turn"
-    GAME_OVER = "game_over"
+# class GamePhase(Enum):
+#     SETUP = "setup"
+#     PLAYER_TURN = "player_turn"
+#     CARD_POWER = "card_power"
+#     ENEMY_TURN = "enemy_turn"
+#     GAME_OVER = "game_over"
 
-class GameState:
-    def __init__(self):
-        pass
+# class GameState:
+#     def __init__(self):
+#         pass

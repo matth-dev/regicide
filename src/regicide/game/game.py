@@ -1,5 +1,5 @@
 from .classes import *
-from ..utils import constants
+from src.regicide.utils import constants
 import random
 
 class RegicideGame:
@@ -47,27 +47,25 @@ class RegicideGame:
     @staticmethod
     def cards_to_shield(player:Player, enemy:Enemy) -> list[Card]:
         while True:
-            # print(player.get_hand_value())
-            # print(enemy.attack)
-            # print(enemy.get_enemy_infos())
-            # print(f"Choose cards to shield yourself against the current enemy damage.")
+            if not player.is_ai:
+                print("Shield phase")
             cards = player.choose_cards()
-            # print([str(card) for card in cards])
             if RegicideGame.get_cards_value(cards) >= enemy.attack:
                 return cards
             else:
-                # print("Not enough value to shield, please try again")
+                if not player.is_ai:
+                    print("Not enough value")
                 player.add_cards(cards=cards)
 
     @staticmethod
     def cards_to_attack(player:Player) -> list[Card]:
         while True:
+            if not player.is_ai:
+                print("Attack phase")
             cards = player.choose_cards()
             if RegicideGame.check_playability(cards):
                 return cards
             else:
-                # if not player.is_ai:
-                    # print("This move is not allowed.")
                 player.add_cards(cards=cards)
 
 
@@ -97,15 +95,15 @@ class RegicideGame:
 
         values = [card.value for card in cards]
 
-        # TODO: review this part
         # If all cards have the same value
         if len(set(values)) == 1:
             # Check if total value inferior or equal to 10
-            if sum(values) <= 10:
-                # Check for multiple jesters played together
-                if sum(values) == 0:
-                    return False
-                return True
+            if sum(values) > 10:
+                return False
+            # Check for multiple jesters played together
+            if sum(values) == 0:
+                return False
+            return True
         else:
             # If cards have a different value
             # Check that only two cards are played and contains an animal companion (Aces)
@@ -113,18 +111,24 @@ class RegicideGame:
 
     def choose_next_player(self, player:Player) -> int:
         while True:
-            # [print(f"{num}: {player.show_player_infos()}") for num, player in enumerate(self.players, 1)]
             if not player.is_ai:
+                print([f"{index}: {p.show_player_infos()}" for index, p in enumerate(self.players, 1)])
                 index = int(input("Choose who is playing next:"))
             else:
-                index = random.randint(1, len(self.players))
+                return random.randint(0, len(self.players)-1)
             try:
-                if 0 > index > len(self.players): raise IndexError
-                return index
+                if 0 >= index > len(self.players): raise IndexError
+                return index - 1 
             except IndexError:
                 pass
-                # print("Please choose an existing player")
 
+
+    def show_game_infos(self, enemy:Enemy) -> None:
+        enemy_infos = enemy.get_enemy_infos()
+        tavern_deck_infos = f"Tavern Deck ({len(self.tavern_deck.deck)})| Discard Pile({len(self.tavern_deck.discard_pile)}): {[str(card) for card in self.tavern_deck.discard_pile]}"
+
+        print(enemy_infos)
+        print(tavern_deck_infos)
 
 def main():
     alice = Player(name="Alice", is_ai=False)
@@ -142,77 +146,69 @@ def main():
 
     kills = 0
 
-    player = players[game.player_index]
 
     while game_on:
+        player = players[game.player_index]
         current_enemy = None
         if game.enemies:
             # ATTACK PHASE
             if not current_enemy: current_enemy = game.enemies[0]
             if player.hand:
-                # print(f"Tavern deck {len(regicide.tavern_deck.deck)}")
-                # print(f"Discard Pile({len(game.tavern_deck.discard_pile)}): {[str(card) for card in game.tavern_deck.discard_pile]}")
-                # print(current_enemy.get_enemy_infos())
-                # print(f"It's your turn {player.name}")
+                game.show_game_infos(enemy=current_enemy)
                 cards = game.cards_to_attack(player)
 
-                # print(f"Cards played: {[str(card) for card in cards]}")
-
                 if not cards:
+                    print("You yield")
                     pass
-                    # print("You yield.")
                 elif "S" in [card.name for card in cards]:
+                    print(f"{player.name} played a Jester!")
                     current_enemy.immune = False
                     game.tavern_deck.discard_pile.extend(cards)
-                    game.player_index = game.choose_next_player(player) - 1
+                    game.player_index = game.choose_next_player(player)
                     player = players[game.player_index]
                     continue
                 else:
                     heal_value, draw_value, damage_value, lower_attack_value = RegicideGame.calculate_attack_value(current_enemy, cards)
                     if heal_value:
                         game.heal(maximum_heal_value=heal_value)
-                        # print(f"Heal: {heal_value}")
 
                     if draw_value:
                         game.deal_cards(draw_value=draw_value)
-                        # print(f"Draw: {draw_value}")
 
-                    # print(f"damage: {damage_value}, lower_attack: {lower_attack_value}")
+                    
                     current_enemy.health -= damage_value
+                    current_enemy.health = max(0, current_enemy.health)
                     current_enemy.attack -= lower_attack_value
                     current_enemy.attack = max(0, current_enemy.attack)
+                    # Probably could use setter to set min hp and attack to 0 here
 
                 game.tavern_deck.discard_pile.extend(cards)
 
+
                 if current_enemy.health <= 0:
-                    # print(f"{current_enemy} died.")
                     kills += 1
                     if current_enemy.health == 0: game.tavern_deck.discard_pile.append(current_enemy)
                     game.enemies.pop(0)
                     current_enemy = game.enemies[0]
                     continue
                 
+                game.show_game_infos(enemy=current_enemy)
 
                 # SHIELD PHASE
                 if current_enemy.attack > 0:
                     if player.get_hand_value() < current_enemy.attack:
-                        # print("You can't shield")
                         game_on = False
-                        break
                     else:
                         cards = RegicideGame.cards_to_shield(player, current_enemy)
                         game.tavern_deck.discard_pile.extend(cards)
-                
             else:
-                # print("No more cards")
                 game_on = False
         else:
-            # print("You won")
             game_on = False
+
         game.player_index += 1
         if game.player_index >= len(players): game.player_index = 0
-        player = players[game.player_index]
-    # print("Game Over")
+
     print(f"Regents killed: {kills}")
     if kills >= 7:
         input("wow")
