@@ -139,14 +139,12 @@ def main():
 
     players:list[Player] = [alice, bob, kevin, julie]
 
-    # random.shuffle(players)
-
     game = RegicideGame(players=players)
 
     game_on = True
 
+    # Only here to track stat
     kills = 0
-
 
     while game_on:
         player = players[game.player_index]
@@ -156,7 +154,7 @@ def main():
             if not current_enemy: current_enemy = game.enemies[0]
             if player.hand:
                 game.show_game_infos(enemy=current_enemy)
-                cards = game.cards_to_attack(player)
+                cards = RegicideGame.cards_to_attack(player)
 
                 if not cards:
                     print(f"{player.name} yield")
@@ -180,12 +178,11 @@ def main():
                     current_enemy.health -= damage_value
                     current_enemy.attack -= lower_attack_value
                     current_enemy.attack = max(0, current_enemy.attack)
-                    # Probably could use setter to set min hp and attack to 0 here
+                    # We are allowing the enemy health to be lower than 0 because of the perfect kill game mechanic
 
                     print(f"{player.name} played {[str(card) for card in cards]}")
 
                 game.tavern_deck.discard_pile.extend(cards)
-
 
                 if current_enemy.health <= 0:
                     kills += 1
@@ -212,8 +209,6 @@ def main():
         if game.player_index >= len(players): game.player_index = 0
 
     print(f"Regents killed: {kills}")
-    if kills >= 7:
-        input("wow")
 
 if __name__ == "__main__":
     main()
