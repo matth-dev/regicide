@@ -54,12 +54,12 @@ uv sync
 
 Run the following commands to play the game (You'll play as Alice)
 
-> As of right now, the game runs entirely in the console, making it challenging to track the actions, especially if you're unfamiliar with the game mechanics. Given that the main focus is on AI agent training, investing in a polished UI isn't imperative.
-
 ```bash
 cd regicide
 uv run -m src.regicide.game.game
 ```
+
+> As of right now, the game runs entirely in the console, making it challenging to track the actions, especially if you're unfamiliar with the game mechanics. Given that the main focus is on AI agent training, investing in a polished UI isn't imperative.
 
 ## 🤖 AI & Gymnasium Integration
 
