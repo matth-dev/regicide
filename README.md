@@ -38,7 +38,7 @@ wip
 
 ### Prerequisites
 - Python 3.13+
-- [UV](https://docs.astral.sh/uv/) package and project manager.
+- [UV](https://docs.astral.sh/uv/) package and dependencies manager.
 
 ### Setup
 ```bash
