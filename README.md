@@ -26,7 +26,7 @@ Find all the (better explained) [Rules](https://www.regicidegame.com/site_files/
 - Gymnasium (AI Training)
 - Pickle (AI models saving)
 
-> May change and is not accurate, especially for the AI training and the game data
+> May change and is not accurate, especially for AI training and game data management
 
 ## 📁 Project Structure
 
