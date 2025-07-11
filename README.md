@@ -20,13 +20,13 @@ Find all the (better explained) [Rules](https://www.regicidegame.com/site_files/
 
 ## 📚 Stack
 
-> Most are predictions - May change and is not accurate
-
 - Python (Game)
 - JSON / CSV / Pandas (Game data)
 - Pytorch / TensorFlow / Scikit-learn (AI models training)
 - Gymnasium (AI Training)
 - Pickle (AI models saving)
+
+> May change and is not accurate, especially for the AI training and the game data
 
 ## 📁 Project Structure
 
