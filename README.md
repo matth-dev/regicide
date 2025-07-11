@@ -54,7 +54,7 @@ uv sync
 
 Run the following commands to play the game (You'll play as Alice)
 
-> Since the game is played in the console, it may be hard to understand what's happening. I do not intend to make this more visually appealing since it's not the purpose of why I'm doing this project, sorry about that.
+> As of right now, the game runs entirely in the console, making it challenging to track the actions, especially if you're unfamiliar with the game mechanics. Given that the main focus is on AI agent training, investing in a polished UI isn't imperative.
 
 ```bash
 cd regicide
